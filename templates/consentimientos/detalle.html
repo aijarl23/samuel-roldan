@@ -1,0 +1,24 @@
+{% extends 'base/base.html' %}
+{% block titulo %}Consentimiento {{ c.id }}{% endblock %}
+{% block contenido %}
+<div class="wrap">
+  <div class="wrap-hdr">
+    <h2>{{ c.plantilla.nombre }} — {{ c.paciente.nombre_completo }}</h2>
+    <div>
+      {% if c.pdf %}<a class="btn" href="/consentimientos/{{ c.id }}/pdf/" target="_blank">📄 Descargar PDF</a>{% endif %}
+      {% if c.drive_url %}<a class="btn gris" href="{{ c.drive_url }}" target="_blank">☁ Ver en Drive</a>{% endif %}
+    </div>
+  </div>
+  <div style="padding:20px;font-size:.85rem;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div><b>Paciente:</b> {{ c.paciente.nombre_completo }}</div>
+    <div><b>Documento:</b> {{ c.paciente.tipo_documento }} {{ c.paciente.documento }}</div>
+    <div><b>Odontólogo:</b> {{ c.odontologo.get_full_name|default:c.odontologo.username }}</div>
+    <div><b>Estado:</b> {{ c.get_estado_display }}</div>
+    <div><b>Fecha firma:</b> {{ c.fecha_firma|default:"—"|date:"d/m/Y H:i" }}</div>
+    <div><b>Hash SHA-256:</b> <code style="font-size:.72rem">{{ c.hash_documento|default:"—" }}</code></div>
+    <div><b>IP de firma:</b> {{ c.ip_firma|default:"—" }}</div>
+    <div><b>Correo enviado:</b> {{ c.enviado_correo|yesno:"Sí,No" }}</div>
+  </div>
+</div>
+<a class="btn gris" href="/">← Volver al panel</a>
+{% endblock %}

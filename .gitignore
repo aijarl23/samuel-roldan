@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+db.sqlite3
+media/
+staticfiles/
+venv/
+credenciales_drive.json
+*.log
+.DS_Store

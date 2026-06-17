@@ -1,0 +1,35 @@
+{% extends 'base/base.html' %}
+{% block titulo %}Pacientes{% endblock %}
+{% block contenido %}
+<div class="card">
+  <div class="ch"><h2>&#128101; Pacientes</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <form method="get" class="sbar">
+        <input name="q" value="{{ q }}" placeholder="Buscar nombre, documento...">
+        <button class="btn p" type="submit">&#128269; Buscar</button>
+        {% if q %}<a class="btn g sm" href="/pacientes/">x</a>{% endif %}
+      </form>
+      <a class="btn n" href="/admin/pacientes/paciente/add/">+ Nuevo</a>
+    </div>
+  </div>
+  <div class="tw"><table>
+    <tr><th>Paciente</th><th>Documento</th><th>Edad</th><th>Telefono</th><th>EPS</th><th>Acciones</th></tr>
+    {% for p in pacientes %}<tr>
+      <td><div class="tn"><strong>{{ p.nombre_completo }}</strong>
+        <small>{{ p.correo|default:"Sin correo" }}</small></div></td>
+      <td>{{ p.tipo_documento }} {{ p.documento }}</td>
+      <td>{% if p.edad %}{{ p.edad }} a{% else %}---{% endif %}</td>
+      <td>{{ p.telefono|default:"---" }}</td>
+      <td>{{ p.eps|default:"---" }}</td>
+      <td style="white-space:nowrap">
+        <a class="btn p sm" href="/pacientes/{{ p.id }}/">Ver</a>
+        <a class="btn n sm" href="/historial/paciente/{{ p.id }}/">Historia</a>
+        <a class="btn g sm" href="/consentimientos/paciente/{{ p.id }}/">Consent.</a>
+      </td>
+    </tr>{% empty %}
+    <tr><td colspan="6" style="text-align:center;padding:36px;color:#90A4AE;">
+      {% if q %}Sin resultados para "{{ q }}".{% else %}Sin pacientes.{% endif %}
+    </td></tr>{% endfor %}
+  </table></div>
+</div>
+{% endblock %}

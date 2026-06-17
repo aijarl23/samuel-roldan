@@ -1,0 +1,57 @@
+{% extends 'base/base.html' %}
+{% block titulo %}Panel Principal{% endblock %}
+{% block contenido %}
+<div class="stats">
+  <div class="stat"><div class="si">&#128101;</div>
+    <div><div class="sn">{{ total_pacientes }}</div><div class="sl">Pacientes activos</div></div></div>
+  <div class="stat n"><div class="si">&#9203;</div>
+    <div><div class="sn">{{ pendientes }}</div><div class="sl">Pendientes de firma</div></div></div>
+  <div class="stat v"><div class="si">&#9989;</div>
+    <div><div class="sn">{{ firmados_hoy }}</div><div class="sl">Firmados hoy</div></div></div>
+  <div class="stat"><div class="si">&#128196;</div>
+    <div><div class="sn">{{ firmados_mes }}</div><div class="sl">Este mes</div></div></div>
+</div>
+
+{% if pendientes_lista %}
+<div class="card">
+  <div class="ch"><h2>&#9889; Pendientes de firma</h2>
+    <a class="btn n" href="/admin/consentimientos/consentimiento/add/">+ Nuevo</a></div>
+  <div class="tw"><table>
+    <tr><th>Paciente</th><th>Procedimiento</th><th>Creado</th><th>Accion</th></tr>
+    {% for c in pendientes_lista %}<tr>
+      <td><div class="tn"><strong>{{ c.paciente.nombre_completo }}</strong>
+        <small>{{ c.paciente.tipo_documento }} {{ c.paciente.documento }}</small></div></td>
+      <td>{{ c.plantilla.nombre }}</td><td>{{ c.creado|date:"d/m/Y H:i" }}</td>
+      <td><a class="btn n sm" href="/consentimientos/firmar/{{ c.id }}/">&#9998; Firmar</a></td>
+    </tr>{% endfor %}
+  </table></div>
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="ch"><h2>&#128203; Consentimientos recientes</h2>
+    <a class="btn o sm" href="/pacientes/">Ver todos &rarr;</a></div>
+  <div class="tw"><table>
+    <tr><th>Paciente</th><th>Tipo</th><th>Odontologo</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr>
+    {% for c in recientes %}<tr>
+      <td><div class="tn"><strong>{{ c.paciente.nombre_completo }}</strong>
+        <small>{{ c.paciente.documento }}</small></div></td>
+      <td>{{ c.plantilla.tipo }}</td>
+      <td>{{ c.odontologo.get_full_name|default:c.odontologo.username }}</td>
+      <td>{% if c.estado == 'PENDIENTE' %}<span class="badge bp">&#9203; Pendiente</span>
+          {% elif c.estado == 'FIRMADO' %}<span class="badge bf">&#9989; Firmado</span>
+          {% elif c.estado == 'BORRADOR' %}<span class="badge bb">Borrador</span>
+          {% else %}<span class="badge ba">Anulado</span>{% endif %}</td>
+      <td>{{ c.fecha_firma|default:c.creado|date:"d/m/Y H:i" }}</td>
+      <td style="white-space:nowrap">
+        {% if c.estado == 'PENDIENTE' %}<a class="btn n sm" href="/consentimientos/firmar/{{ c.id }}/">&#9998;</a>{% endif %}
+        {% if c.pdf %}<a class="btn p sm" href="/consentimientos/{{ c.id }}/pdf/" target="_blank">&#128196;</a>{% endif %}
+        <a class="btn o sm" href="/consentimientos/{{ c.id }}/">Ver</a>
+      </td>
+    </tr>{% empty %}
+    <tr><td colspan="6" style="text-align:center;padding:36px;color:#90A4AE;">
+      Sin consentimientos. <a href="/admin/consentimientos/consentimiento/add/" style="color:#1565C0;font-weight:700;">Crear el primero</a>
+    </td></tr>{% endfor %}
+  </table></div>
+</div>
+{% endblock %}

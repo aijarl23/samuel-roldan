@@ -1,0 +1,38 @@
+{% extends "admin/base.html" %}
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | Samuel Roldan{% endblock %}
+{% block branding %}
+<h1 id="site-name" style="padding:4px 0;margin:0;">
+  <a href="{% url 'admin:index' %}"
+     style="display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff;">
+    <img src="data:image/png;base64,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"
+         style="height:48px;width:auto;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.3);"
+         alt="Logo">
+    <span style="line-height:1.25;">
+      <span style="font-size:.95rem;font-weight:700;color:#fff;display:block;">
+        Consultorio Odontologico Samuel Roldan
+      </span>
+      <span style="font-size:.7rem;color:#FB8C00;font-weight:700;letter-spacing:.8px;">
+        ORTODONCISTA
+      </span>
+    </span>
+  </a>
+</h1>
+{% endblock %}
+{% block nav_global %}{% endblock %}
+{% block extrastyle %}{{ block.super }}
+<style>
+#header{background:linear-gradient(135deg,#0D47A1,#1565C0);padding:8px 20px;}
+#header a:link,#header a:visited{color:#fff;}
+#branding h1{margin:0;padding:0;}
+.module h2,.module caption,.inline-group h2{background:#1565C0;}
+div.breadcrumbs{background:#0D47A1;}
+div.breadcrumbs a{color:rgba(255,255,255,.85);}
+a:link,a:visited{color:#1565C0;}
+.button,input[type=submit]{background:#1565C0 !important;border-color:#0D47A1 !important;}
+.button:hover{background:#0D47A1 !important;}
+#footer{text-align:center;font-size:.7rem;color:#90A4AE;padding:10px;}
+</style>
+{% endblock %}
+{% block footer %}
+<div id="footer">&copy; {% now "Y" %} Consultorio Odontologico Samuel Roldan</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base/base.html' %}
+{% block titulo %}Consentimientos — {{ paciente.nombre_completo }}{% endblock %}
+{% block contenido %}
+<div class="wrap">
+  <div class="wrap-hdr">
+    <h2>Consentimientos de {{ paciente.nombre_completo }}</h2>
+    <a class="btn naranja" href="/admin/consentimientos/consentimiento/add/">+ Nuevo</a>
+  </div>
+  <table>
+    <tr><th>Procedimiento</th><th>Estado</th><th>Fecha</th><th></th></tr>
+    {% for c in consentimientos %}
+    <tr>
+      <td>{{ c.plantilla.nombre }}</td>
+      <td>{{ c.get_estado_display }}</td>
+      <td>{{ c.fecha_firma|default:c.creado|date:"d/m/Y" }}</td>
+      <td>
+        {% if c.estado == 'PENDIENTE' %}<a class="btn naranja sm" href="/consentimientos/firmar/{{ c.id }}/">✍ Firmar</a>{% endif %}
+        {% if c.pdf %}<a class="btn sm" href="/consentimientos/{{ c.id }}/pdf/">📄 PDF</a>{% endif %}
+      </td>
+    </tr>
+    {% empty %}<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--gris-texto)">Sin consentimientos</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

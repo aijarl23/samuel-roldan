@@ -1,0 +1,22 @@
+{% extends 'base/base.html' %}
+{% block titulo %}{{ paciente.nombre_completo }}{% endblock %}
+{% block contenido %}
+<div class="wrap">
+  <div class="wrap-hdr">
+    <h2>{{ paciente.nombre_completo }}</h2>
+    <div>
+      <a class="btn" href="/historial/paciente/{{ paciente.id }}/">📋 Historia clínica</a>
+      <a class="btn naranja" href="/consentimientos/paciente/{{ paciente.id }}/">📄 Consentimientos</a>
+    </div>
+  </div>
+  <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:.85rem;">
+    <div><b>Documento:</b> {{ paciente.tipo_documento }} {{ paciente.documento }}</div>
+    <div><b>Fecha nacimiento:</b> {{ paciente.fecha_nacimiento|default:"—"|date:"d/m/Y" }}{% if paciente.edad %} ({{ paciente.edad }} años){% endif %}</div>
+    <div><b>Teléfono:</b> {{ paciente.telefono|default:"—" }}</div>
+    <div><b>Correo:</b> {{ paciente.correo|default:"—" }}</div>
+    <div><b>EPS:</b> {{ paciente.eps|default:"—" }}</div>
+    <div><b>Ciudad:</b> {{ paciente.ciudad }}</div>
+    {% if paciente.alergias %}<div style="grid-column:1/-1"><b>Alergias:</b> {{ paciente.alergias }}</div>{% endif %}
+  </div>
+</div>
+{% endblock %}
