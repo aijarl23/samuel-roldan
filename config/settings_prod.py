@@ -8,7 +8,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'clave-local-samuel-2026')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = [
-    'https://samuel-roldan-production.up.railway.app',
+    'https://web-production-92666.up.railway.app',
     'https://*.up.railway.app',
     'http://localhost:8005',
 ]
