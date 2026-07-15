@@ -42,7 +42,7 @@
       Paciente: <strong>{{ c.paciente.nombre_completo }}</strong> &nbsp;·&nbsp;
       {{ c.paciente.tipo_documento }} {{ c.paciente.documento }}
       {% if c.paciente.edad %}&nbsp;·&nbsp; {{ c.paciente.edad }} años{% endif %}
-      &nbsp;·&nbsp; Odontólogo: {{ c.odontologo.get_full_name|default:c.odontologo.username }}
+      &nbsp;·&nbsp; Odontólogo: {{ c.odontólogo.get_full_name|default:c.odontólogo.username }}
     </div>
     <div class="doc-texto">{{ texto }}</div>
   </div>
@@ -50,7 +50,7 @@
   <form method="post" id="form-firma" autocomplete="off">
     {% csrf_token %}
 
-    {% if c.plantilla.requiere_autorizacion_expediente %}
+    {% if c.plantilla.requiere_autorización_expediente %}
     <div class="auth-box">
       <p><strong>Autorización para uso del expediente:</strong> ¿Autoriza que su información y expediente sea utilizado con fines de consulta, investigación, educación o publicación en revistas profesionales?</p>
       <div class="radio-group">

@@ -30,14 +30,14 @@
 
 <div class="card">
   <div class="ch"><h2>&#128203; Consentimientos recientes</h2>
-    <a class="btn o sm" href="/pacientes/">Ver todos &rarr;</a></div>
+    <a class="btn o sm" href="/pacientes/">Ver todos →</a></div>
   <div class="tw"><table>
-    <tr><th>Paciente</th><th>Tipo</th><th>Odontologo</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr>
+    <tr><th>Paciente</th><th>Tipo</th><th>Odontólogo</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr>
     {% for c in recientes %}<tr>
       <td><div class="tn"><strong>{{ c.paciente.nombre_completo }}</strong>
         <small>{{ c.paciente.documento }}</small></div></td>
       <td>{{ c.plantilla.tipo }}</td>
-      <td>{{ c.odontologo.get_full_name|default:c.odontologo.username }}</td>
+      <td>{{ c.odontólogo.get_full_name|default:c.odontólogo.username }}</td>
       <td>{% if c.estado == 'PENDIENTE' %}<span class="badge bp">&#9203; Pendiente</span>
           {% elif c.estado == 'FIRMADO' %}<span class="badge bf">&#9989; Firmado</span>
           {% elif c.estado == 'BORRADOR' %}<span class="badge bb">Borrador</span>

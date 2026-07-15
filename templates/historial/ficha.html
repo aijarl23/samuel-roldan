@@ -21,7 +21,7 @@
       <td>{{ e.fecha|date:"d/m/Y H:i" }}</td>
       <td>{{ e.procedimiento }}</td>
       <td>{{ e.dientes_tratados|default:"—" }}</td>
-      <td>{{ e.odontologo.get_full_name|default:e.odontologo.username }}</td>
+      <td>{{ e.odontólogo.get_full_name|default:e.odontólogo.username }}</td>
       <td>{{ e.valor_cobrado|default:"—" }}</td>
       <td>{{ e.fecha_proxima_cita|default:"—"|date:"d/m/Y" }}</td>
     </tr>
