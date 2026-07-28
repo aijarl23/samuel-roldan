@@ -12,7 +12,7 @@
   <div style="padding:20px;font-size:.85rem;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
     <div><b>Paciente:</b> {{ c.paciente.nombre_completo }}</div>
     <div><b>Documento:</b> {{ c.paciente.tipo_documento }} {{ c.paciente.documento }}</div>
-    <div><b>Odontólogo:</b> {{ c.odontólogo.get_full_name|default:c.odontólogo.username }}</div>
+    <div><b>Odontólogo:</b> {{ c.odontologo.get_full_name|default:c.odontologo.username }}</div>
     <div><b>Estado:</b> {{ c.get_estado_display }}</div>
     <div><b>Fecha firma:</b> {{ c.fecha_firma|default:"—"|date:"d/m/Y H:i" }}</div>
     <div><b>Hash SHA-256:</b> <code style="font-size:.72rem">{{ c.hash_documento|default:"—" }}</code></div>

@@ -37,7 +37,7 @@
       <td><div class="tn"><strong>{{ c.paciente.nombre_completo }}</strong>
         <small>{{ c.paciente.documento }}</small></div></td>
       <td>{{ c.plantilla.tipo }}</td>
-      <td>{{ c.odontólogo.get_full_name|default:c.odontólogo.username }}</td>
+      <td>{{ c.odontologo.get_full_name|default:c.odontologo.username }}</td>
       <td>{% if c.estado == 'PENDIENTE' %}<span class="badge bp">&#9203; Pendiente</span>
           {% elif c.estado == 'FIRMADO' %}<span class="badge bf">&#9989; Firmado</span>
           {% elif c.estado == 'BORRADOR' %}<span class="badge bb">Borrador</span>

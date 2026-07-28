@@ -8,9 +8,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'clave-local-samuel-2026')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = [
-    'https://web-production-92666.up.railway.app',
+    'https://samuel-roldan-production.up.railway.app',
     'https://*.up.railway.app',
     'http://localhost:8005',
+    'http://127.0.0.1:8005',
 ]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -90,4 +91,4 @@ TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', '')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', '')
 TWILIO_WHATSAPP_FROM = os.environ.get('TWILIO_WHATSAPP_FROM', '')
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'Consultorio Samuel Roldan <noreply@samuelroldan.co>'
+DEFAULT_FROM_EMAIL = 'Clinica R Samuel Roldan <noreply@clinica-r.co>'

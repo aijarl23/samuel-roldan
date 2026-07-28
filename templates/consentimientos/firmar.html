@@ -42,7 +42,7 @@
       Paciente: <strong>{{ c.paciente.nombre_completo }}</strong> &nbsp;·&nbsp;
       {{ c.paciente.tipo_documento }} {{ c.paciente.documento }}
       {% if c.paciente.edad %}&nbsp;·&nbsp; {{ c.paciente.edad }} años{% endif %}
-      &nbsp;·&nbsp; Odontólogo: {{ c.odontólogo.get_full_name|default:c.odontólogo.username }}
+      &nbsp;·&nbsp; Odontólogo: {{ c.odontologo.get_full_name|default:c.odontologo.username }}
     </div>
     <div class="doc-texto">{{ texto }}</div>
   </div>
