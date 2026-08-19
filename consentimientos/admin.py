@@ -52,6 +52,15 @@ class ConsentimientoAdmin(admin.ModelAdmin):
             'creado', 'creado_por',
         )
 
+    def get_readonly_fields(self, request, obj=None):
+        campos = list(self.readonly_fields)
+        if obj is not None and obj.estado == 'FIRMADO':
+            # Documento legal firmado: solo el estado (para anular) y las
+            # notas internas quedan editables. El resto es inmutable
+            # (también reforzado a nivel de modelo en Consentimiento.save()).
+            campos += ['paciente', 'plantilla', 'odontologo', 'autoriza_expediente']
+        return campos
+
     def estado_col(self, obj):
         color, label = self.COLS.get(obj.estado, ('#000', obj.estado))
         return mark_safe(f'<b style="color:{color}">{label}</b>')

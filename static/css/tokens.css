@@ -1,0 +1,91 @@
+/* ===========================================================
+   TOKENS.CSS — Sistema de diseño Clínica R (Samuel Roldán)
+   Extraído del manual de marca. Ajustar hex si se recibe el
+   valor exacto del archivo fuente de diseño.
+   =========================================================== */
+:root{
+  /* --- Paleta de marca --- */
+  --cr-primario:        #26453F;   /* verde inglés oscuro */
+  --cr-primario-dark:   #1B322D;
+  --cr-primario-light:  #35594F;
+  --cr-secundario:      #4C5F45;   /* verde oliva */
+  --cr-terciario-1:     #BFD4C6;   /* menta pálido */
+  --cr-terciario-2:     #A9C877;   /* verde lima */
+  --cr-complementario:  #F5EFDD;   /* crema */
+  --cr-blanco:          #FFFFFF;
+
+  /* --- Semántica --- */
+  --cr-exito:      #4C7A3F;
+  --cr-exito-bg:    #E7F0E1;
+  --cr-pendiente:   #B9791F;
+  --cr-pendiente-bg: #FBF0DD;
+  --cr-error:       #B4362B;
+  --cr-error-bg:    #F8E4E1;
+  --cr-info:        #2E5E8C;
+  --cr-info-bg:     #E4EEF6;
+
+  /* --- Texto --- */
+  --cr-texto:        #1C2B27;
+  --cr-texto-suave:  #55665F;
+  --cr-texto-tenue:  #8B978F;
+  --cr-texto-invertido: #FFFFFF;
+
+  /* --- Bordes / superficies --- */
+  --cr-borde:       #DDE4DE;
+  --cr-borde-fuerte: #C3CDC6;
+  --cr-superficie:   #FFFFFF;
+  --cr-fondo:        var(--cr-complementario);
+  --cr-fondo-sutil:  #FAF7EE;
+
+  /* --- Tipografía --- */
+  --cr-font-ui: system-ui, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --cr-font-cuerpo: "Nunito Sans", "Work Sans", system-ui, sans-serif;
+  --cr-fs-caption: .75rem;
+  --cr-fs-body: .875rem;
+  --cr-fs-subtitulo: 1.125rem;
+  --cr-fs-titulo: 1.5rem;
+  --cr-fs-heroe: 2rem;
+  --cr-fw-regular: 400;
+  --cr-fw-medium: 600;
+  --cr-fw-bold: 800;
+
+  /* --- Espaciado (escala de 8px) --- */
+  --cr-sp-1: 4px;
+  --cr-sp-2: 8px;
+  --cr-sp-3: 16px;
+  --cr-sp-4: 24px;
+  --cr-sp-5: 32px;
+  --cr-sp-6: 48px;
+  --cr-sp-7: 64px;
+
+  /* --- Radios / sombras --- */
+  --cr-radio-sm: 8px;
+  --cr-radio-md: 14px;
+  --cr-radio-lg: 22px;
+  --cr-radio-full: 999px;
+  --cr-sombra-sm: 0 1px 3px rgba(28,43,39,.08);
+  --cr-sombra-md: 0 6px 20px rgba(28,43,39,.10);
+  --cr-sombra-lg: 0 16px 40px rgba(28,43,39,.16);
+
+  /* --- Transiciones --- */
+  --cr-transicion: .18s ease;
+}
+
+*, *::before, *::after{ box-sizing:border-box; }
+html, body{ margin:0; padding:0; }
+body{
+  background: var(--cr-fondo);
+  color: var(--cr-texto);
+  font-family: var(--cr-font-cuerpo);
+  font-size: var(--cr-fs-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+h1,h2,h3,h4{ font-family: var(--cr-font-ui); color: var(--cr-primario); margin:0 0 var(--cr-sp-2); }
+a{ color: var(--cr-primario); }
+::selection{ background: var(--cr-terciario-2); color: var(--cr-primario-dark); }
+
+/* Scrollbar sutil */
+::-webkit-scrollbar{ width:10px; height:10px; }
+::-webkit-scrollbar-thumb{ background: var(--cr-terciario-1); border-radius: var(--cr-radio-full); }
+::-webkit-scrollbar-track{ background: transparent; }

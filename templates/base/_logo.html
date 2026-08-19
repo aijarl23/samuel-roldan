@@ -1,0 +1,26 @@
+{% comment %}
+Logo vectorial Clínica R — monograma "R" + arco de puntos (sonrisa) + wordmark.
+Recibe: color (hex del trazo) y size (alto en px). Uso: {% include "base/_logo.html" with color="#FFFFFF" size=34 texto=True %}
+{% endcomment %}
+<svg viewBox="0 0 220 140" style="height:{{ size|default:34 }}px;width:auto;display:block" xmlns="http://www.w3.org/2000/svg" aria-label="Clínica R">
+  <g fill="none" stroke="{{ color|default:'#26453F' }}" stroke-width="7" stroke-linecap="round">
+    <path d="M78 30 V78" />
+    <path d="M78 30 h14 a12 12 0 0 1 0 24 h-14" />
+    <path d="M92 54 L108 78" stroke-width="7"/>
+    <circle cx="78" cy="16" r="4" fill="{{ color|default:'#26453F' }}" stroke="none"/>
+  </g>
+  <g fill="{{ color|default:'#26453F' }}">
+    <circle cx="18" cy="66" r="2.4"/>
+    <circle cx="24" cy="76" r="3"/>
+    <circle cx="32" cy="85" r="3.6"/>
+    <circle cx="43" cy="91" r="4"/>
+    <circle cx="55" cy="94" r="4.2"/>
+    <circle cx="68" cy="94" r="4.2"/>
+    <circle cx="80" cy="91" r="4.4"/>
+    <circle cx="94" cy="85" r="5.6"/>
+    <circle cx="107" cy="74" r="6.4"/>
+  </g>
+  {% if texto %}
+  <text x="110" y="122" text-anchor="middle" font-family="system-ui,'Segoe UI',sans-serif" font-size="17" letter-spacing="2" fill="{{ color|default:'#26453F' }}" font-weight="700">CLÍNICA R</text>
+  {% endif %}
+</svg>

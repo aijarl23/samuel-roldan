@@ -1,0 +1,17 @@
+{% comment %} Convierte django.contrib.messages en toasts visuales. No cambia el backend de mensajes. {% endcomment %}
+<div class="cr-toast-region" id="cr-toast-region">
+  {% for m in messages %}
+  <div class="cr-toast cr-toast-{% if m.tags == 'error' %}error{% elif m.tags == 'warning' %}warning{% elif m.tags == 'info' %}info{% else %}exito{% endif %}">
+    <span>
+      {% if m.tags == 'error' %}&#9888;{% elif m.tags == 'warning' %}&#9888;{% elif m.tags == 'info' %}&#8505;{% else %}&#10003;{% endif %}
+    </span>
+    <span>{{ m }}</span>
+    <button type="button" class="cr-toast-close" onclick="this.parentElement.remove()">&times;</button>
+  </div>
+  {% endfor %}
+</div>
+<script>
+  setTimeout(function(){
+    document.querySelectorAll('.cr-toast').forEach(function(t){ t.style.transition='opacity .3s'; t.style.opacity='0'; setTimeout(function(){ t.remove(); }, 300); });
+  }, 5000);
+</script>

@@ -4,6 +4,7 @@ ReportLab es la opción correcta para producción en Windows: sin dependencias d
 """
 import io, base64, os, logging
 from datetime import datetime
+from xml.sax.saxutils import escape as _esc
 from django.conf import settings
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import cm
@@ -15,11 +16,11 @@ from reportlab.lib import colors
 
 logger = logging.getLogger(__name__)
 
-AZUL = colors.HexColor('#1565C0')
-AZUL_OSC = colors.HexColor('#0D47A1')
-NARANJA = colors.HexColor('#FB8C00')
-GRIS = colors.HexColor('#90A4AE')
-NEGRO = colors.HexColor('#263238')
+AZUL = colors.HexColor('#26453F')
+AZUL_OSC = colors.HexColor('#1B322D')
+NARANJA = colors.HexColor('#A9C877')
+GRIS = colors.HexColor('#8B978F')
+NEGRO = colors.HexColor('#1C2B27')
 
 
 def _firma_image(b64_data, ancho=6*cm, alto=2.5*cm):
@@ -41,7 +42,7 @@ def _encabezado_pie(canvas, doc):
     canvas.rect(0, h - 2.2*cm, w, 2.2*cm, fill=1, stroke=0)
     canvas.setFillColor(colors.white)
     canvas.setFont('Helvetica-Bold', 13)
-    canvas.drawString(1.5*cm, h - 1.3*cm, 'CONSULTORIO ODONTOLÓGICO SAMUEL ROLDÁN')
+    canvas.drawString(1.5*cm, h - 1.3*cm, 'CLÍNICA R · SAMUEL ROLDÁN')
     canvas.setFont('Helvetica', 8)
     canvas.drawString(1.5*cm, h - 1.9*cm, 'Sistema de Consentimientos Informados')
     canvas.setFont('Helvetica', 7)
@@ -98,11 +99,11 @@ def generar(consentimiento):
     # Tabla de datos del paciente
     edad = f'({p.edad} años)' if p.edad else ''
     datos = [
-        ['Paciente:', f'{p.nombre_completo} {edad}',
-         'Documento:', f'{p.tipo_documento} {p.documento}'],
-        ['Odontólogo:', od.get_full_name() or od.username,
+        ['Paciente:', _esc(f'{p.nombre_completo} {edad}'),
+         'Documento:', _esc(f'{p.tipo_documento} {p.documento}')],
+        ['Odontólogo:', _esc(od.get_full_name() or od.username),
          'Fecha:', f.strftime('%d/%m/%Y %H:%M')],
-        ['EPS:', p.eps or '—', 'Ciudad:', p.ciudad or 'Medellín'],
+        ['EPS:', _esc(p.eps) or '—', 'Ciudad:', _esc(p.ciudad) or 'Medellín'],
     ]
     tbl = Table(datos, colWidths=[2.8*cm, 6.5*cm, 2.8*cm, 4.8*cm])
     tbl.setStyle(TableStyle([
@@ -111,11 +112,11 @@ def generar(consentimiento):
         ('FONTNAME', (2,0), (2,-1), 'Helvetica-Bold'),
         ('TEXTCOLOR', (0,0), (0,-1), AZUL), ('TEXTCOLOR', (2,0), (2,-1), AZUL),
         ('BOTTOMPADDING', (0,0), (-1,-1), 4), ('TOPPADDING', (0,0), (-1,-1), 4),
-        ('ROWBACKGROUNDS', (0,0), (-1,-1), [colors.white, colors.HexColor('#F5F7FA')]),
+        ('ROWBACKGROUNDS', (0,0), (-1,-1), [colors.white, colors.HexColor('#F2EEE0')]),
     ]))
     el.append(tbl)
     el.append(Spacer(1, 0.4*cm))
-    el.append(HRFlowable(width='100%', thickness=0.5, color=colors.HexColor('#CFD8DC')))
+    el.append(HRFlowable(width='100%', thickness=0.5, color=colors.HexColor('#C3CDC6')))
     el.append(Spacer(1, 0.3*cm))
 
     # Texto del consentimiento
@@ -125,12 +126,12 @@ def generar(consentimiento):
         if not linea:
             el.append(Spacer(1, 0.2*cm))
         else:
-            el.append(Paragraph(linea, s_cuerpo))
+            el.append(Paragraph(_esc(linea), s_cuerpo))
 
     # Autorización de expediente
     if c.plantilla.requiere_autorizacion_expediente and c.autoriza_expediente is not None:
         el.append(Spacer(1, 0.4*cm))
-        el.append(HRFlowable(width='100%', thickness=0.5, color=colors.HexColor('#CFD8DC')))
+        el.append(HRFlowable(width='100%', thickness=0.5, color=colors.HexColor('#C3CDC6')))
         si = '[X]' if c.autoriza_expediente else '[ ]'
         no = '[ ]' if c.autoriza_expediente else '[X]'
         el.append(Spacer(1, 0.2*cm))
@@ -146,9 +147,9 @@ def generar(consentimiento):
     firma_p_img = _firma_image(c.firma_paciente)
     firma_a_img = _firma_image(c.firma_acudiente) if p.es_menor else None
 
-    f_lbl_p = (f'{p.nombre_completo}\n{p.tipo_documento} {p.documento}\n'
+    f_lbl_p = _esc(f'{p.nombre_completo}\n{p.tipo_documento} {p.documento}\n'
                f'{"Paciente" if not p.es_menor else "Paciente (menor de edad)"}')
-    f_lbl_a = (f'{p.acudiente_nombre}\n{p.acudiente_tipo_doc} {p.acudiente_documento}\n'
+    f_lbl_a = _esc(f'{p.acudiente_nombre}\n{p.acudiente_tipo_doc} {p.acudiente_documento}\n'
                f'Acudiente / {p.acudiente_parentesco}') if p.es_menor else ''
 
     col_p = [firma_p_img or Paragraph('_' * 40, s_cuerpo),
@@ -164,16 +165,16 @@ def generar(consentimiento):
 
     # Sello de auditoría
     el.append(Spacer(1, 0.8*cm))
-    el.append(HRFlowable(width='100%', thickness=0.5, color=colors.HexColor('#CFD8DC')))
+    el.append(HRFlowable(width='100%', thickness=0.5, color=colors.HexColor('#C3CDC6')))
     el.append(Spacer(1, 0.15*cm))
     el.append(Paragraph(
         f'SELLO DE AUDITORÍA ELECTRÓNICA — '
         f'Firmado: {f.strftime("%d/%m/%Y a las %H:%M:%S")} (Colombia UTC-5) — '
-        f'IP: {c.ip_firma or "N/D"} — '
-        f'Dispositivo: {(c.dispositivo or "N/D")[:80]} — '
+        f'IP: {_esc(c.ip_firma or "N/D")} — '
+        f'Dispositivo: {_esc((c.dispositivo or "N/D")[:80])} — '
         f'Hash SHA-256: {c.hash_documento or "N/D"} — '
         f'Plantilla v{c.plantilla.version} — '
-        f'Odontólogo responsable: {od.get_full_name() or od.username}', s_audit))
+        f'Odontólogo responsable: {_esc(od.get_full_name() or od.username)}', s_audit))
 
     doc.build(el, onFirstPage=_encabezado_pie, onLaterPages=_encabezado_pie)
     logger.info('PDF generado: %s (%d bytes)', ruta, os.path.getsize(ruta))

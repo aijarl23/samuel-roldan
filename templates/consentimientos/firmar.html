@@ -1,113 +1,79 @@
 {% extends 'base/base.html' %}
 {% block titulo %}Firmar consentimiento{% endblock %}
-{% block extra_css %}
-<style>
-.firma-wrap{max-width:780px;margin:0 auto;}
-.doc-card{background:#fff;border-radius:14px;padding:24px;box-shadow:var(--sombra);margin-bottom:16px;}
-.doc-titulo{font-size:1.05rem;font-weight:700;color:var(--azul-osc);margin-bottom:4px;}
-.doc-meta{font-size:.8rem;color:var(--gris-texto);margin-bottom:16px;}
-.doc-texto{font-size:.83rem;line-height:1.6;max-height:280px;overflow-y:auto;border:1px solid #ECEFF1;border-radius:8px;padding:14px;background:#FAFAFA;white-space:pre-line;color:#37474F;}
-.seccion{margin-top:20px;}
-.seccion-titulo{font-size:.85rem;font-weight:700;color:var(--azul);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
-/* Radio auth */
-.auth-box{background:var(--naranja-claro);border:1px solid #FFE0B2;border-radius:10px;padding:14px;margin:16px 0;}
-.auth-box p{font-size:.82rem;margin-bottom:10px;color:#5D4037;}
-.radio-group{display:flex;gap:16px;}
-.radio-group label{display:flex;align-items:center;gap:7px;font-size:.85rem;font-weight:600;cursor:pointer;padding:8px 16px;border-radius:8px;border:2px solid #FFE0B2;background:#fff;transition:all .2s;}
-.radio-group input[type=radio]{display:none;}
-.radio-group input[type=radio]:checked+span{color:var(--naranja);}
-.radio-group label:has(input:checked){border-color:var(--naranja);background:var(--naranja-claro);}
-/* Canvas firma */
-.firma-box{margin-bottom:16px;}
-.firma-lbl{font-weight:600;font-size:.88rem;color:var(--azul-osc);margin-bottom:6px;display:block;}
-.firma-lbl small{font-weight:400;color:var(--gris-texto);font-size:.75rem;}
-.canvas-wrap{position:relative;border:2.5px dashed var(--azul);border-radius:10px;background:#fff;overflow:hidden;}
-.canvas-wrap canvas{display:block;width:100%;height:180px;touch-action:none;cursor:crosshair;}
-.canvas-wrap .hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;color:#B0BEC5;font-size:.8rem;flex-direction:column;gap:6px;transition:opacity .3s;}
-.canvas-wrap .hint.hidden{opacity:0;}
-.limpiar-btn{background:none;border:none;color:var(--gris-texto);font-size:.75rem;cursor:pointer;padding:4px 0;margin-top:4px;text-decoration:underline;}
-.limpiar-btn:hover{color:var(--rojo);}
-/* Botón enviar */
-.btn-firmar{width:100%;background:linear-gradient(135deg,var(--naranja),#F57C00);color:#fff;border:none;padding:16px;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:20px;box-shadow:0 4px 12px rgba(251,140,0,.35);transition:opacity .2s;}
-.btn-firmar:hover{opacity:.9;}
-.btn-firmar:disabled{opacity:.5;cursor:not-allowed;}
-.advertencia{background:#FFF3E0;border:1px solid #FFE0B2;border-radius:8px;padding:10px 14px;font-size:.78rem;color:#5D4037;margin-top:12px;}
-</style>
-{% endblock %}
 {% block contenido %}
-<div class="firma-wrap">
-  <div class="doc-card">
-    <div class="doc-titulo">{{ c.plantilla.nombre }}</div>
-    <div class="doc-meta">
-      Paciente: <strong>{{ c.paciente.nombre_completo }}</strong> &nbsp;·&nbsp;
-      {{ c.paciente.tipo_documento }} {{ c.paciente.documento }}
-      {% if c.paciente.edad %}&nbsp;·&nbsp; {{ c.paciente.edad }} años{% endif %}
-      &nbsp;·&nbsp; Odontólogo: {{ c.odontologo.get_full_name|default:c.odontologo.username }}
+<a href="{% url 'pacientes:detalle' c.paciente.pk %}" class="cr-back-link">&larr; Volver a la ficha de {{ c.paciente.nombre_completo }}</a>
+
+<div class="cr-main-narrow" style="margin:0 auto">
+  <div class="cr-stepper cr-mb-4">
+    <div class="cr-step is-done"><div class="cr-step-circle">&#10003;</div><span class="cr-step-label">Tipo</span></div>
+    <div class="cr-step-line"></div>
+    <div class="cr-step is-active"><div class="cr-step-circle">2</div><span class="cr-step-label">Revisar y firmar</span></div>
+  </div>
+
+  <div class="cr-card cr-mb-3">
+    <div class="cr-card-header">
+      <div>
+        <h2 class="cr-card-title">{{ c.plantilla.nombre }}</h2>
+        <p class="cr-text-suave cr-text-sm cr-mt-2" style="margin-top:4px">
+          {{ c.paciente.nombre_completo }} &middot; {{ c.paciente.tipo_documento }} {{ c.paciente.documento }}
+          {% if c.paciente.edad %} &middot; {{ c.paciente.edad }} años{% endif %}
+        </p>
+      </div>
     </div>
-    <div class="doc-texto">{{ texto }}</div>
+    <p class="cr-text-tenue cr-text-sm cr-mb-2">Atiende: Dr(a). {{ c.odontologo.get_full_name|default:c.odontologo.username }}</p>
+    <div class="cr-legal-box">{{ texto|linebreaks }}</div>
   </div>
 
   <form method="post" id="form-firma" autocomplete="off">
     {% csrf_token %}
 
-    {% if c.plantilla.requiere_autorización_expediente %}
-    <div class="auth-box">
-      <p><strong>Autorización para uso del expediente:</strong> ¿Autoriza que su información y expediente sea utilizado con fines de consulta, investigación, educación o publicación en revistas profesionales?</p>
-      <div class="radio-group">
-        <label>
+    {% if c.plantilla.requiere_autorizacion_expediente %}
+    <div class="cr-card cr-mb-3" style="border-color:var(--cr-terciario-2)">
+      <p class="cr-text-sm cr-mb-3"><strong style="color:var(--cr-primario)">Autorización para uso del expediente:</strong> ¿Autoriza que su información y expediente sea utilizado con fines de consulta, investigación, educación o publicación en revistas profesionales?</p>
+      <div class="cr-flex cr-gap-3">
+        <label class="cr-check" style="flex:1;cursor:pointer">
           <input type="radio" name="autoriza_expediente" value="si" required>
-          <span>✅ SÍ, autorizo</span>
+          <span>Sí, autorizo</span>
         </label>
-        <label>
+        <label class="cr-check" style="flex:1;cursor:pointer">
           <input type="radio" name="autoriza_expediente" value="no">
-          <span>❌ NO autorizo</span>
+          <span>No autorizo</span>
         </label>
       </div>
     </div>
     {% endif %}
 
-    <div class="doc-card">
-      <div class="seccion-titulo">✍ Firma del paciente</div>
-      <label class="firma-lbl">
-        {{ c.paciente.nombre_completo }}
-        <small>— Firme en el recuadro con el dedo o el mouse</small>
-      </label>
-      <div class="canvas-wrap" id="wrap-paciente">
+    <div class="cr-card cr-mb-3">
+      <h3 class="cr-seccion-titulo">&#9997; Firma del paciente</h3>
+      <label class="cr-label">{{ c.paciente.nombre_completo }} <span class="cr-help" style="display:inline">— firme con el dedo o el mouse</span></label>
+      <div class="cr-firma-canvas-wrap" id="wrap-paciente">
         <canvas id="canvas-paciente"></canvas>
-        <div class="hint" id="hint-paciente">
-          <span style="font-size:2rem">✍</span>
-          <span>Firme aquí</span>
-        </div>
+        <div class="cr-firma-placeholder" id="hint-paciente">Firme aquí</div>
       </div>
-      <button type="button" class="limpiar-btn" onclick="limpiarCanvas('paciente')">🗑 Limpiar firma</button>
+      <button type="button" class="cr-btn cr-btn-ghost cr-btn-sm cr-mt-2" onclick="limpiarCanvas('paciente')">Limpiar firma</button>
       <input type="hidden" name="firma_paciente" id="firma-paciente">
     </div>
 
     {% if c.paciente.es_menor %}
-    <div class="doc-card">
-      <div class="seccion-titulo">✍ Firma del acudiente</div>
-      <label class="firma-lbl">
-        {{ c.paciente.acudiente_nombre }} ({{ c.paciente.acudiente_parentesco }})
-        <small>— Paciente menor de edad, se requiere firma del acudiente</small>
-      </label>
-      <div class="canvas-wrap" id="wrap-acudiente">
+    <div class="cr-card cr-mb-3">
+      <h3 class="cr-seccion-titulo">&#9997; Firma del acudiente</h3>
+      <label class="cr-label">{{ c.paciente.acudiente_nombre }} ({{ c.paciente.acudiente_parentesco }}) <span class="cr-help" style="display:inline">— paciente menor de edad</span></label>
+      <div class="cr-firma-canvas-wrap" id="wrap-acudiente">
         <canvas id="canvas-acudiente"></canvas>
-        <div class="hint" id="hint-acudiente">
-          <span style="font-size:2rem">✍</span>
-          <span>Firme aquí</span>
-        </div>
+        <div class="cr-firma-placeholder" id="hint-acudiente">Firme aquí</div>
       </div>
-      <button type="button" class="limpiar-btn" onclick="limpiarCanvas('acudiente')">🗑 Limpiar firma</button>
+      <button type="button" class="cr-btn cr-btn-ghost cr-btn-sm cr-mt-2" onclick="limpiarCanvas('acudiente')">Limpiar firma</button>
       <input type="hidden" name="firma_acudiente" id="firma-acudiente">
     </div>
     {% endif %}
 
-    <div class="advertencia">
-      ⚠ Al presionar <strong>"Confirmar y firmar"</strong>, usted acepta haber leído y comprendido el contenido del consentimiento informado. Esta acción es legalmente vinculante.
+    <div class="cr-toast cr-toast-warning" style="position:static;animation:none;margin-bottom:16px">
+      <span>&#9888;</span>
+      <span>Al presionar "Confirmar y firmar", usted acepta haber leído y comprendido el contenido del consentimiento informado. Esta acción es legalmente vinculante.</span>
     </div>
 
-    <button type="submit" class="btn-firmar" id="btn-enviar">
-      ✅ Confirmar y firmar consentimiento
+    <button type="submit" class="cr-btn cr-btn-primario cr-btn-full" id="btn-enviar" style="padding:16px">
+      <span class="cr-btn-label">&#10003; Confirmar y firmar consentimiento</span>
     </button>
   </form>
 </div>
@@ -129,7 +95,7 @@ function initCanvas(id) {
     canvas.height = rect.height * window.devicePixelRatio;
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    ctx.strokeStyle = '#0D47A1';
+    ctx.strokeStyle = '#26453F';
     if (data && !empty) { const img = new Image(); img.src = data; img.onload = () => ctx.drawImage(img, 0, 0, rect.width, rect.height); }
   }
   resize();
@@ -143,6 +109,7 @@ function initCanvas(id) {
   function start(e) {
     drawing = true; empty = false;
     hint.classList.add('hidden');
+    hint.style.display = 'none';
     const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y);
     e.preventDefault();
   }
@@ -166,7 +133,7 @@ function initCanvas(id) {
   canvases[id] = { canvas, ctx, hint, hidden, clear: () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     empty = true; hidden.value = '';
-    hint.classList.remove('hidden');
+    hint.style.display = 'flex';
   }};
 }
 
@@ -190,8 +157,10 @@ document.getElementById('form-firma').addEventListener('submit', function(e) {
     return;
   }
   {% endif %}
-  document.getElementById('btn-enviar').disabled = true;
-  document.getElementById('btn-enviar').textContent = '⏳ Guardando...';
+  const btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+  btn.classList.add('is-loading');
+  btn.querySelector('.cr-btn-label').textContent = 'Guardando...';
 });
 </script>
 {% endblock %}

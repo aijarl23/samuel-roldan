@@ -1,9 +1,10 @@
 from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from .models import FichaClinica
 from pacientes.models import Paciente
 
 @login_required
+@permission_required('historial.view_fichaclinica', raise_exception=True)
 def ficha(request, paciente_pk):
     paciente = get_object_or_404(Paciente, pk=paciente_pk)
     ficha, _ = FichaClinica.objects.select_related('odontologo_principal').get_or_create(

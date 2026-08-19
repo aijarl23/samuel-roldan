@@ -1,0 +1,85 @@
+{% load static %}
+<form method="post" action="{% url 'pacientes:crear_panel' %}" data-cr-ajax>
+  {% csrf_token %}
+  {% if form.non_field_errors %}
+    <div class="cr-error-text cr-mb-3">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <div class="cr-fieldset">
+    <div class="cr-fieldset-legend">Identificación</div>
+    <div class="cr-row">
+      <div class="cr-field">
+        <label class="cr-label">Tipo de documento</label>
+        {{ form.tipo_documento }}
+      </div>
+      <div class="cr-field">
+        <label class="cr-label">Número <span class="req">*</span></label>
+        {{ form.documento }}
+        {% if form.documento.errors %}<div class="cr-error-text">{{ form.documento.errors|striptags }}</div>{% endif %}
+      </div>
+    </div>
+    <div class="cr-field">
+      <label class="cr-label">Nombres <span class="req">*</span></label>
+      {{ form.nombres }}
+      {% if form.nombres.errors %}<div class="cr-error-text">{{ form.nombres.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="cr-field">
+      <label class="cr-label">Apellidos <span class="req">*</span></label>
+      {{ form.apellidos }}
+      {% if form.apellidos.errors %}<div class="cr-error-text">{{ form.apellidos.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="cr-row">
+      <div class="cr-field">
+        <label class="cr-label">Fecha de nacimiento</label>
+        {{ form.fecha_nacimiento }}
+      </div>
+      <div class="cr-field">
+        <label class="cr-label">Teléfono</label>
+        {{ form.telefono }}
+      </div>
+    </div>
+  </div>
+
+  <div class="cr-fieldset">
+    <label class="cr-check">
+      {{ form.es_menor }}
+      <span>Es menor de edad — requiere datos del acudiente para poder firmar consentimientos</span>
+    </label>
+  </div>
+
+  <div class="cr-fieldset" id="cr-datos-acudiente" style="{% if not form.es_menor.value %}display:none{% endif %}">
+    <div class="cr-fieldset-legend">Datos del acudiente</div>
+    <div class="cr-field">
+      <label class="cr-label">Nombre del acudiente</label>
+      {{ form.acudiente_nombre }}
+      {% if form.acudiente_nombre.errors %}<div class="cr-error-text">{{ form.acudiente_nombre.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="cr-row">
+      <div class="cr-field">
+        <label class="cr-label">Documento</label>
+        {{ form.acudiente_documento }}
+      </div>
+      <div class="cr-field">
+        <label class="cr-label">Parentesco</label>
+        {{ form.acudiente_parentesco }}
+      </div>
+    </div>
+    <div class="cr-field">
+      <label class="cr-label">Teléfono del acudiente</label>
+      {{ form.acudiente_telefono }}
+    </div>
+  </div>
+
+  <p class="cr-text-tenue cr-text-sm cr-mb-3">Podrás completar antecedentes médicos, EPS y demás datos después, desde la Ficha del Paciente.</p>
+
+  <button type="submit" class="cr-btn cr-btn-primario cr-btn-full">
+    <span class="cr-btn-label">Crear paciente y continuar</span>
+  </button>
+</form>
+<script>
+(function(){
+  var chk = document.getElementById('id_es_menor');
+  var box = document.getElementById('cr-datos-acudiente');
+  if(chk){ chk.addEventListener('change', function(){ box.style.display = chk.checked ? 'block' : 'none'; }); }
+})();
+</script>

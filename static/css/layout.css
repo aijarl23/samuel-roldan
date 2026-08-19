@@ -1,0 +1,142 @@
+/* ===========================================================
+   LAYOUT.CSS — Estructura general Clínica R
+   =========================================================== */
+
+.cr-app{ min-height:100vh; display:flex; flex-direction:column; }
+
+/* ---------- Barra superior ---------- */
+.cr-topbar{
+  position:sticky; top:0; z-index:100; background:var(--cr-primario); color:#fff;
+  padding:0 var(--cr-sp-4); height:64px; display:flex; align-items:center; gap:var(--cr-sp-4);
+  box-shadow: var(--cr-sombra-md);
+}
+.cr-topbar-brand{ display:flex; align-items:center; gap:10px; text-decoration:none; color:#fff; flex-shrink:0; }
+.cr-topbar-brand img{ height:30px; width:auto; }
+.cr-topbar-brand-text{ font-family:var(--cr-font-ui); font-weight:var(--cr-fw-bold); font-size:1rem; line-height:1.1; }
+.cr-topbar-brand-text small{ display:block; font-weight:var(--cr-fw-regular); font-size:.65rem; opacity:.75; letter-spacing:.03em; }
+
+.cr-topbar-search{ flex:1; max-width:520px; position:relative; }
+.cr-topbar-search input{
+  width:100%; padding:10px 16px 10px 40px; border-radius:var(--cr-radio-full); border:none;
+  background:rgba(255,255,255,.14); color:#fff; font-size:.85rem; font-family:var(--cr-font-cuerpo);
+}
+.cr-topbar-search input::placeholder{ color:rgba(255,255,255,.65); }
+.cr-topbar-search input:focus{ outline:none; background:#fff; color:var(--cr-texto); }
+.cr-topbar-search input:focus::placeholder{ color:var(--cr-texto-tenue); }
+.cr-topbar-search-icon{ position:absolute; left:14px; top:50%; transform:translateY(-50%); opacity:.75; pointer-events:none; }
+.cr-topbar-search:focus-within .cr-topbar-search-icon{ opacity:.4; }
+
+.cr-search-results{
+  position:absolute; top:calc(100% + 8px); left:0; right:0; background:#fff; border-radius:var(--cr-radio-md);
+  box-shadow:var(--cr-sombra-lg); max-height:360px; overflow-y:auto; display:none; z-index:200;
+}
+.cr-search-results.is-open{ display:block; }
+.cr-search-item{ display:flex; align-items:center; justify-content:space-between; padding:12px 16px; cursor:pointer; color:var(--cr-texto); text-decoration:none; border-bottom:1px solid var(--cr-borde); }
+.cr-search-item:last-child{ border-bottom:none; }
+.cr-search-item:hover{ background:var(--cr-fondo-sutil); }
+.cr-search-item-name{ font-weight:var(--cr-fw-medium); font-size:.87rem; }
+.cr-search-item-doc{ font-size:.75rem; color:var(--cr-texto-tenue); }
+.cr-search-empty{ padding:20px 16px; }
+.cr-search-empty p{ margin:0 0 10px; color:var(--cr-texto-suave); font-size:.85rem; }
+
+.cr-topbar-user{ display:flex; align-items:center; gap:12px; flex-shrink:0; }
+.cr-topbar-user-name{ font-size:.82rem; font-weight:var(--cr-fw-medium); }
+.cr-topbar-avatar{ width:34px; height:34px; border-radius:50%; background:var(--cr-terciario-2); color:var(--cr-primario-dark); display:flex; align-items:center; justify-content:center; font-weight:var(--cr-fw-bold); font-size:.85rem; }
+.cr-topbar-link{ color:rgba(255,255,255,.85); text-decoration:none; font-size:.8rem; padding:6px 10px; border-radius:var(--cr-radio-sm); transition:background var(--cr-transicion); }
+.cr-topbar-link:hover{ background:rgba(255,255,255,.12); color:#fff; }
+
+/* ---------- Contenedor principal ---------- */
+.cr-main{ flex:1; max-width:1180px; margin:0 auto; width:100%; padding:var(--cr-sp-5) var(--cr-sp-4); }
+.cr-main-narrow{ max-width:640px; }
+
+/* ---------- Grillas ---------- */
+.cr-grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:var(--cr-sp-3); }
+.cr-grid-2{ display:grid; grid-template-columns:2fr 1fr; gap:var(--cr-sp-4); }
+@media (max-width:900px){ .cr-grid-3{ grid-template-columns:1fr; } .cr-grid-2{ grid-template-columns:1fr; } }
+
+/* ---------- Migas / encabezado de sección ---------- */
+.cr-page-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--cr-sp-4); flex-wrap:wrap; gap:12px; }
+.cr-back-link{ display:inline-flex; align-items:center; gap:6px; color:var(--cr-texto-suave); text-decoration:none; font-size:.82rem; margin-bottom:8px; }
+.cr-back-link:hover{ color:var(--cr-primario); }
+.cr-page-title{ font-size:var(--cr-fs-titulo); font-weight:var(--cr-fw-bold); color:var(--cr-primario); margin:0; }
+.cr-page-subtitle{ color:var(--cr-texto-suave); font-size:.85rem; margin-top:2px; }
+
+/* ---------- Login ---------- */
+.cr-login-shell{ min-height:100vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(160deg, var(--cr-primario) 0%, var(--cr-primario-dark) 100%); padding:20px; }
+.cr-login-card{ background:#fff; border-radius:var(--cr-radio-lg); box-shadow:var(--cr-sombra-lg); width:100%; max-width:400px; overflow:hidden; }
+.cr-login-brand{ padding:40px 32px 24px; text-align:center; background:var(--cr-fondo-sutil); }
+.cr-login-brand img{ height:64px; margin-bottom:10px; }
+.cr-login-brand h1{ font-size:1.05rem; margin:0; }
+.cr-login-brand p{ color:var(--cr-texto-suave); font-size:.78rem; margin:2px 0 0; }
+.cr-login-body{ padding:28px 32px 32px; }
+
+/* ---------- Ficha del paciente: layout específico ---------- */
+.cr-ficha-header{ background:var(--cr-superficie); border-radius:var(--cr-radio-md); border:1px solid var(--cr-borde); padding:var(--cr-sp-4); margin-bottom:var(--cr-sp-4); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; }
+.cr-ficha-identidad{ display:flex; align-items:center; gap:16px; }
+.cr-ficha-avatar{ width:56px; height:56px; border-radius:50%; background:var(--cr-terciario-1); color:var(--cr-primario-dark); display:flex; align-items:center; justify-content:center; font-weight:var(--cr-fw-bold); font-size:1.3rem; flex-shrink:0; }
+.cr-ficha-nombre{ font-size:1.2rem; font-weight:var(--cr-fw-bold); color:var(--cr-primario); margin:0; }
+.cr-ficha-meta{ color:var(--cr-texto-suave); font-size:.82rem; margin-top:2px; }
+.cr-ficha-acciones{ display:flex; gap:10px; flex-wrap:wrap; }
+
+.cr-datos-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:var(--cr-sp-3); }
+.cr-dato{ }
+.cr-dato-label{ font-size:.7rem; text-transform:uppercase; letter-spacing:.04em; color:var(--cr-texto-tenue); font-weight:var(--cr-fw-medium); margin-bottom:2px; }
+.cr-dato-valor{ font-size:.9rem; color:var(--cr-texto); font-weight:var(--cr-fw-medium); }
+
+.cr-seccion{ margin-bottom: var(--cr-sp-5); }
+.cr-seccion-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--cr-sp-3); }
+.cr-seccion-titulo{ font-size:1rem; font-weight:var(--cr-fw-bold); color:var(--cr-primario); margin:0; display:flex; align-items:center; gap:8px; }
+
+/* ---------- Contenedor de texto legal (consentimiento) ---------- */
+.cr-legal-box{ max-height:320px; overflow-y:auto; padding:18px 20px; background:var(--cr-fondo-sutil); border:1px solid var(--cr-borde); border-radius:var(--cr-radio-sm); font-size:.82rem; line-height:1.7; color:var(--cr-texto); }
+.cr-legal-box p{ margin:0 0 12px; }
+.cr-legal-box strong{ color:var(--cr-primario); }
+
+/* ---------- Firma ---------- */
+.cr-firma-canvas-wrap{ border:2px dashed var(--cr-borde-fuerte); border-radius:var(--cr-radio-md); background:#fff; position:relative; }
+.cr-firma-canvas-wrap canvas{ display:block; width:100%; height:180px; touch-action:none; cursor:crosshair; border-radius:var(--cr-radio-md); }
+.cr-firma-placeholder{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--cr-texto-tenue); font-size:.8rem; pointer-events:none; }
+
+/* ---------- Tipos de consentimiento (selector) ---------- */
+.cr-tipo-grid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--cr-sp-3); }
+@media (max-width:520px){ .cr-tipo-grid{ grid-template-columns:1fr; } }
+.cr-tipo-card{ border:2px solid var(--cr-borde); border-radius:var(--cr-radio-md); padding:var(--cr-sp-4); cursor:pointer; transition:all var(--cr-transicion); background:#fff; text-align:left; }
+.cr-tipo-card:hover{ border-color:var(--cr-terciario-2); background:var(--cr-fondo-sutil); }
+.cr-tipo-card.is-selected{ border-color:var(--cr-primario); background:var(--cr-fondo-sutil); box-shadow:var(--cr-sombra-sm); }
+.cr-tipo-card-icon{ width:38px; height:38px; border-radius:var(--cr-radio-sm); background:var(--cr-terciario-1); color:var(--cr-primario); display:flex; align-items:center; justify-content:center; margin-bottom:10px; }
+.cr-tipo-card-title{ font-weight:var(--cr-fw-bold); color:var(--cr-primario); font-size:.9rem; margin-bottom:4px; }
+.cr-tipo-card-desc{ font-size:.76rem; color:var(--cr-texto-suave); }
+
+/* responsive general */
+@media (max-width:700px){
+  .cr-topbar{ gap:var(--cr-sp-2); padding:0 var(--cr-sp-3); }
+  .cr-topbar-brand-text{ display:none; }
+  .cr-topbar-user-name{ display:none; }
+  .cr-topbar-link{ display:none; }              /* "Administración" se mueve al menú de usuario en pantallas chicas */
+  .cr-topbar-search{ position:static; }          /* permite que el dropdown de resultados ocupe todo el ancho */
+  .cr-search-results{ left:var(--cr-sp-3); right:var(--cr-sp-3); top:64px; }
+  .cr-main{ padding: var(--cr-sp-4) var(--cr-sp-3); }
+  .cr-drawer{ width:100%; }
+}
+
+@media (max-width:480px){
+  .cr-topbar{ padding:0 var(--cr-sp-2); }
+  .cr-topbar-user{ gap:6px; }
+  /* Botón "+ Nuevo paciente" se reduce a solo icono para dejar espacio real al buscador,
+     que es la acción más frecuente y debe quedar siempre visible y usable con el pulgar. */
+  #cr-topbar-nuevo-paciente .cr-btn-texto{ display:none; }
+  #cr-topbar-nuevo-paciente{ padding:0; width:38px; height:38px; border-radius:50%; flex-shrink:0; }
+  .cr-topbar-avatar{ width:30px; height:30px; font-size:.75rem; }
+  .cr-search-results{ left:var(--cr-sp-2); right:var(--cr-sp-2); }
+
+  /* Ficha del Paciente: botones de acción a ancho completo, apilados, más fáciles
+     de tocar con el pulgar que dos botones angostos lado a lado. */
+  .cr-ficha-acciones{ width:100%; }
+  .cr-ficha-acciones .cr-btn{ flex:1 1 auto; }
+
+  /* Stepper: en pantallas angostas los 3 pasos con texto completo no caben.
+     Se ocultan las etiquetas de los pasos inactivos y solo se muestra la del
+     paso activo, conservando círculos y líneas como referencia de progreso. */
+  .cr-step:not(.is-active) .cr-step-label{ display:none; }
+  .cr-step-label{ font-size:.72rem; white-space:nowrap; }
+}

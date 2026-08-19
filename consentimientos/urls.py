@@ -3,6 +3,7 @@ from . import views
 
 app_name = 'consentimientos'
 urlpatterns = [
+    path('asistente/<int:paciente_pk>/', views.asistente, name='asistente'),
     path('firmar/<int:pk>/', views.firmar, name='firmar'),
     path('<int:pk>/', views.detalle, name='detalle'),
     path('<int:pk>/pdf/', views.ver_pdf, name='pdf'),

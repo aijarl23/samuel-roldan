@@ -1,0 +1,9 @@
+{% extends "base/base.html" %}
+{% block titulo %}Acceso restringido{% endblock %}
+{% block contenido %}
+<div style="max-width:420px;margin:64px auto;text-align:center;">
+  <h1 style="font-size:1.25rem;margin-bottom:8px;">Acceso restringido</h1>
+  <p style="color:var(--cr-texto-tenue);">Tu rol no tiene permiso para realizar esta acción. Si crees que es un error, contacta al administrador del sistema.</p>
+  <a class="cr-btn cr-btn-secundario cr-btn-sm" href="/" style="margin-top:16px;display:inline-flex;">Volver al panel</a>
+</div>
+{% endblock %}

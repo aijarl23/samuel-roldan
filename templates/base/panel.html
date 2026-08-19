@@ -1,57 +1,102 @@
-{% extends 'base/base.html' %}
-{% block titulo %}Panel Principal{% endblock %}
+{% extends "base/base.html" %}
+{% block titulo %}Panel{% endblock %}
 {% block contenido %}
-<div class="stats">
-  <div class="stat"><div class="si">&#128101;</div>
-    <div><div class="sn">{{ total_pacientes }}</div><div class="sl">Pacientes activos</div></div></div>
-  <div class="stat n"><div class="si">&#9203;</div>
-    <div><div class="sn">{{ pendientes }}</div><div class="sl">Pendientes de firma</div></div></div>
-  <div class="stat v"><div class="si">&#9989;</div>
-    <div><div class="sn">{{ firmados_hoy }}</div><div class="sl">Firmados hoy</div></div></div>
-  <div class="stat"><div class="si">&#128196;</div>
-    <div><div class="sn">{{ firmados_mes }}</div><div class="sl">Este mes</div></div></div>
+<div class="cr-page-header">
+  <div>
+    <h1 class="cr-page-title">Buenos días, {{ request.user.get_full_name|default:request.user.username }}</h1>
+    <p class="cr-page-subtitle">{% now "l, j \d\e F \d\e Y" as cr_fecha_hoy %}{{ cr_fecha_hoy|capfirst }}</p>
+  </div>
+  <button type="button" class="cr-btn cr-btn-primario" onclick="crDrawer.open({url:'/pacientes/nuevo/panel/', title:'Nuevo paciente'})">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+    Nuevo paciente
+  </button>
 </div>
 
-{% if pendientes_lista %}
-<div class="card">
-  <div class="ch"><h2>&#9889; Pendientes de firma</h2>
-    <a class="btn n" href="/admin/consentimientos/consentimiento/add/">+ Nuevo</a></div>
-  <div class="tw"><table>
-    <tr><th>Paciente</th><th>Procedimiento</th><th>Creado</th><th>Accion</th></tr>
-    {% for c in pendientes_lista %}<tr>
-      <td><div class="tn"><strong>{{ c.paciente.nombre_completo }}</strong>
-        <small>{{ c.paciente.tipo_documento }} {{ c.paciente.documento }}</small></div></td>
-      <td>{{ c.plantilla.nombre }}</td><td>{{ c.creado|date:"d/m/Y H:i" }}</td>
-      <td><a class="btn n sm" href="/consentimientos/firmar/{{ c.id }}/">&#9998; Firmar</a></td>
-    </tr>{% endfor %}
-  </table></div>
+<div class="cr-grid-3 cr-mb-4">
+  <div class="cr-metric">
+    <div class="cr-flex cr-items-center cr-justify-between">
+      <span class="cr-metric-label">Pendientes de firma</span>
+      <span class="cr-metric-icon">&#9203;</span>
+    </div>
+    <span class="cr-metric-value">{{ pendientes }}</span>
+  </div>
+  <div class="cr-metric">
+    <div class="cr-flex cr-items-center cr-justify-between">
+      <span class="cr-metric-label">Firmados hoy</span>
+      <span class="cr-metric-icon" style="background:var(--cr-exito-bg);color:var(--cr-exito)">&#10003;</span>
+    </div>
+    <span class="cr-metric-value">{{ firmados_hoy }}</span>
+  </div>
+  <div class="cr-metric">
+    <div class="cr-flex cr-items-center cr-justify-between">
+      <span class="cr-metric-label">Este mes</span>
+      <span class="cr-metric-icon" style="background:var(--cr-info-bg);color:var(--cr-info)">&#128197;</span>
+    </div>
+    <span class="cr-metric-value">{{ firmados_mes }}</span>
+  </div>
 </div>
-{% endif %}
 
-<div class="card">
-  <div class="ch"><h2>&#128203; Consentimientos recientes</h2>
-    <a class="btn o sm" href="/pacientes/">Ver todos →</a></div>
-  <div class="tw"><table>
-    <tr><th>Paciente</th><th>Tipo</th><th>Odontólogo</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr>
-    {% for c in recientes %}<tr>
-      <td><div class="tn"><strong>{{ c.paciente.nombre_completo }}</strong>
-        <small>{{ c.paciente.documento }}</small></div></td>
-      <td>{{ c.plantilla.tipo }}</td>
-      <td>{{ c.odontologo.get_full_name|default:c.odontologo.username }}</td>
-      <td>{% if c.estado == 'PENDIENTE' %}<span class="badge bp">&#9203; Pendiente</span>
-          {% elif c.estado == 'FIRMADO' %}<span class="badge bf">&#9989; Firmado</span>
-          {% elif c.estado == 'BORRADOR' %}<span class="badge bb">Borrador</span>
-          {% else %}<span class="badge ba">Anulado</span>{% endif %}</td>
-      <td>{{ c.fecha_firma|default:c.creado|date:"d/m/Y H:i" }}</td>
-      <td style="white-space:nowrap">
-        {% if c.estado == 'PENDIENTE' %}<a class="btn n sm" href="/consentimientos/firmar/{{ c.id }}/">&#9998;</a>{% endif %}
-        {% if c.pdf %}<a class="btn p sm" href="/consentimientos/{{ c.id }}/pdf/" target="_blank">&#128196;</a>{% endif %}
-        <a class="btn o sm" href="/consentimientos/{{ c.id }}/">Ver</a>
-      </td>
-    </tr>{% empty %}
-    <tr><td colspan="6" style="text-align:center;padding:36px;color:#90A4AE;">
-      Sin consentimientos. <a href="/admin/consentimientos/consentimiento/add/" style="color:#1565C0;font-weight:700;">Crear el primero</a>
-    </td></tr>{% endfor %}
-  </table></div>
+<div class="cr-grid-2">
+  <div class="cr-seccion">
+    <div class="cr-seccion-header">
+      <h2 class="cr-seccion-titulo">Consentimientos recientes</h2>
+      <a href="{% url 'pacientes:lista' %}" class="cr-text-sm">Ver todos los pacientes →</a>
+    </div>
+    <div class="cr-card cr-card-flat" style="padding:0">
+      <div class="cr-table-wrap" style="border:none">
+        <table class="cr-table">
+          <thead><tr><th>Paciente</th><th>Tipo</th><th>Estado</th><th>Fecha</th><th></th></tr></thead>
+          <tbody>
+            {% for c in recientes %}
+            <tr>
+              <td>
+                <a href="{% url 'pacientes:detalle' c.paciente.pk %}" style="text-decoration:none;color:var(--cr-texto)">
+                  <strong style="color:var(--cr-primario)">{{ c.paciente.nombre_completo }}</strong><br>
+                  <span class="cr-text-tenue cr-text-sm">{{ c.paciente.documento }}</span>
+                </a>
+              </td>
+              <td>{{ c.plantilla.tipo }}</td>
+              <td>
+                {% if c.estado == 'PENDIENTE' %}<span class="cr-badge cr-badge-pendiente"><span class="cr-badge-dot"></span>Pendiente</span>
+                {% elif c.estado == 'FIRMADO' %}<span class="cr-badge cr-badge-exito"><span class="cr-badge-dot"></span>Firmado</span>
+                {% elif c.estado == 'BORRADOR' %}<span class="cr-badge cr-badge-neutro">Borrador</span>
+                {% else %}<span class="cr-badge cr-badge-error">Anulado</span>{% endif %}
+              </td>
+              <td class="cr-text-sm cr-text-suave">{{ c.creado|date:"d/m/Y" }}</td>
+              <td>
+                {% if c.estado == 'PENDIENTE' %}
+                <a href="{% url 'consentimientos:firmar' c.pk %}" class="cr-btn cr-btn-outline cr-btn-sm">Firmar</a>
+                {% else %}
+                <a href="{% url 'pacientes:detalle' c.paciente.pk %}" class="cr-btn cr-btn-ghost cr-btn-sm">Ver</a>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="cr-table-empty">Aún no hay consentimientos registrados. <a href="#" onclick="crDrawer.open({url:'/pacientes/nuevo/panel/', title:'Nuevo paciente'});return false;">Crea el primer paciente</a>.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="cr-seccion">
+    <div class="cr-seccion-header">
+      <h2 class="cr-seccion-titulo">Pendientes de firma</h2>
+    </div>
+    <div class="cr-flex-col cr-gap-2">
+      {% for c in pendientes_lista %}
+      <a href="{% url 'consentimientos:firmar' c.pk %}" class="cr-card cr-card-flat" style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;padding:14px 16px">
+        <div>
+          <strong style="color:var(--cr-primario);font-size:.86rem">{{ c.paciente.nombre_completo }}</strong>
+          <div class="cr-text-tenue cr-text-sm">{{ c.plantilla.tipo }}</div>
+        </div>
+        <span class="cr-badge cr-badge-pendiente">Firmar →</span>
+      </a>
+      {% empty %}
+      <div class="cr-card cr-card-flat cr-text-center cr-text-tenue" style="padding:24px">Sin pendientes. ¡Al día! &#127881;</div>
+      {% endfor %}
+    </div>
+  </div>
 </div>
 {% endblock %}

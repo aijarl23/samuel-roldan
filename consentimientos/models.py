@@ -1,6 +1,7 @@
 import hashlib
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from auditlog.registry import auditlog
 from pacientes.models import Paciente
@@ -81,6 +82,14 @@ class Consentimiento(models.Model):
     notas_internas = models.TextField('Notas internas (no visibles para el paciente)', blank=True)
     creado = models.DateTimeField(auto_now_add=True)
 
+    # Campos que constituyen el documento legal firmado: una vez el
+    # consentimiento pasa a FIRMADO, ninguno de estos puede cambiar.
+    CAMPOS_INMUTABLES_TRAS_FIRMA = [
+        'paciente_id', 'plantilla_id', 'odontologo_id', 'texto_generado',
+        'firma_paciente', 'firma_acudiente', 'fecha_firma', 'hash_documento',
+        'autoriza_expediente',
+    ]
+
     class Meta:
         verbose_name = 'Consentimiento'
         verbose_name_plural = 'Consentimientos'
@@ -113,6 +122,30 @@ class Consentimiento(models.Model):
 
     def get_absolute_url(self):
         return reverse('consentimientos:detalle', kwargs={'pk': self.pk})
+
+    def _validar_inmutabilidad(self):
+        """Un consentimiento FIRMADO es un documento legal: solo puede
+        pasar a ANULADO (revocación), nunca editarse ni "des-firmarse"."""
+        if not self.pk:
+            return
+        original = Consentimiento.objects.filter(pk=self.pk).first()
+        if not original or original.estado != 'FIRMADO':
+            return
+        for campo in self.CAMPOS_INMUTABLES_TRAS_FIRMA:
+            if getattr(original, campo) != getattr(self, campo):
+                raise ValidationError(
+                    'Este consentimiento ya fue firmado y es un documento legal inmutable: '
+                    'no se puede modificar su contenido, firma o auditoría.')
+        if original.estado != self.estado and self.estado != 'ANULADO':
+            raise ValidationError(
+                'Un consentimiento firmado solo puede cambiar de estado a "Anulado".')
+
+    def clean(self):
+        self._validar_inmutabilidad()
+
+    def save(self, *args, **kwargs):
+        self._validar_inmutabilidad()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'{self.plantilla.nombre} — {self.paciente.nombre_completo} [{self.get_estado_display()}]'

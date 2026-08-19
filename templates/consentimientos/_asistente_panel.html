@@ -1,0 +1,34 @@
+{% load static %}
+<div class="cr-stepper cr-mb-4">
+  <div class="cr-step is-active"><div class="cr-step-circle">1</div><span class="cr-step-label">Elegir tipo</span></div>
+  <div class="cr-step-line"></div>
+  <div class="cr-step"><div class="cr-step-circle">2</div><span class="cr-step-label">Revisar</span></div>
+  <div class="cr-step-line"></div>
+  <div class="cr-step"><div class="cr-step-circle">3</div><span class="cr-step-label">Firmar</span></div>
+</div>
+
+<p class="cr-text-suave cr-text-sm cr-mb-3">Paciente: <strong style="color:var(--cr-primario)">{{ paciente.nombre_completo }}</strong></p>
+
+<form method="post" action="{% url 'consentimientos:asistente' paciente.pk %}" data-cr-ajax>
+  {% csrf_token %}
+  <div class="cr-tipo-grid cr-mb-4">
+    {% for t in tipos %}
+    <label class="cr-tipo-card" onclick="document.querySelectorAll('.cr-tipo-card').forEach(function(c){c.classList.remove('is-selected')}); this.classList.add('is-selected');">
+      <input type="radio" name="plantilla_id" value="{{ t.pk }}" style="display:none" required>
+      <div class="cr-tipo-card-icon">&#128220;</div>
+      <div class="cr-tipo-card-title">{{ t.nombre }}</div>
+      <div class="cr-tipo-card-desc">{{ t.get_tipo_display }} &middot; v{{ t.version }}</div>
+    </label>
+    {% empty %}
+    <div class="cr-empty-state" style="grid-column:1/-1">
+      <p>No hay plantillas de consentimiento activas.</p>
+      <p class="cr-text-sm">Contacta al administrador para activar una plantilla.</p>
+    </div>
+    {% endfor %}
+  </div>
+  {% if tipos %}
+  <button type="submit" class="cr-btn cr-btn-primario cr-btn-full">
+    <span class="cr-btn-label">Continuar a revisión y firma →</span>
+  </button>
+  {% endif %}
+</form>

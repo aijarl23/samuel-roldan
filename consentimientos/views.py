@@ -1,8 +1,9 @@
 import logging
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from django.http import FileResponse, JsonResponse, Http404
+from django.urls import reverse
 from django.utils import timezone
 from django.core.files import File
 from django.db.models import Count, Q
@@ -18,6 +19,32 @@ logger = logging.getLogger(__name__)
 
 
 @login_required
+@permission_required('consentimientos.add_consentimiento', raise_exception=True)
+def asistente(request, paciente_pk):
+    """Paso 1 del asistente de consentimiento (drawer): elegir el tipo de
+    plantilla. Al confirmar, crea el Consentimiento en estado PENDIENTE y
+    entrega la URL de la vista `firmar` ya existente — la captura de firma,
+    generación de PDF y notificaciones NO se duplican, se reutilizan tal cual."""
+    paciente = get_object_or_404(Paciente, pk=paciente_pk)
+    tipos = PlantillaConsentimiento.objects.filter(activa=True).order_by('nombre')
+
+    if request.method == 'POST':
+        plantilla_id = request.POST.get('plantilla_id')
+        plantilla = get_object_or_404(PlantillaConsentimiento, pk=plantilla_id, activa=True)
+        c = Consentimiento.objects.create(
+            paciente=paciente, plantilla=plantilla,
+            odontologo=request.user, creado_por=request.user,
+            estado='PENDIENTE',
+        )
+        return JsonResponse({'redirect': reverse('consentimientos:firmar', args=[c.pk])})
+
+    return render(request, 'consentimientos/_asistente_panel.html', {
+        'paciente': paciente, 'tipos': tipos,
+    })
+
+
+@login_required
+@permission_required('consentimientos.view_consentimiento', raise_exception=True)
 def panel(request):
     hoy = timezone.localdate()
     ctx = {
@@ -38,6 +65,7 @@ def panel(request):
 
 
 @login_required
+@permission_required('consentimientos.change_consentimiento', raise_exception=True)
 def firmar(request, pk):
     """Vista de firma — optimizada para touch en tablet/celular."""
     c = get_object_or_404(
@@ -98,6 +126,7 @@ def firmar(request, pk):
 
 
 @login_required
+@permission_required('consentimientos.view_consentimiento', raise_exception=True)
 def detalle(request, pk):
     c = get_object_or_404(
         Consentimiento.objects.select_related('paciente', 'plantilla', 'odontologo', 'creado_por'), pk=pk)
@@ -105,6 +134,7 @@ def detalle(request, pk):
 
 
 @login_required
+@permission_required('consentimientos.view_consentimiento', raise_exception=True)
 def ver_pdf(request, pk):
     c = get_object_or_404(Consentimiento, pk=pk)
     if not c.pdf:
@@ -114,6 +144,7 @@ def ver_pdf(request, pk):
 
 
 @login_required
+@permission_required('consentimientos.view_consentimiento', raise_exception=True)
 def lista_paciente(request, paciente_pk):
     paciente = get_object_or_404(Paciente, pk=paciente_pk)
     consentimientos = paciente.consentimientos.select_related(

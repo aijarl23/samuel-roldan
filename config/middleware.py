@@ -22,8 +22,8 @@ class RoleContextMiddleware:
 
     def __call__(self, request):
         if request.user.is_authenticated:
-            grupos = list(request.user.groups.values_list('name', flat=True))
+            grupos = set(request.user.groups.values_list('name', flat=True))
             request.es_admin = request.user.is_superuser or 'Administrador' in grupos
-            request.es_odontologo = 'Odontólogo' in grupos or request.es_admin
+            request.es_odontologo = bool(grupos & {'Odontólogo', 'Odontologo'}) or request.es_admin
             request.es_auxiliar = 'Auxiliar' in grupos or request.es_admin
         return self.get_response(request)

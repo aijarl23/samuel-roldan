@@ -1,22 +1,118 @@
 {% extends 'base/base.html' %}
 {% block titulo %}{{ paciente.nombre_completo }}{% endblock %}
 {% block contenido %}
-<div class="wrap">
-  <div class="wrap-hdr">
-    <h2>{{ paciente.nombre_completo }}</h2>
+<a href="/" class="cr-back-link">&larr; Volver al panel</a>
+
+<div class="cr-ficha-header">
+  <div class="cr-ficha-identidad">
+    <div class="cr-ficha-avatar">{{ paciente.nombres|first|upper }}{{ paciente.apellidos|first|upper }}</div>
     <div>
-      <a class="btn" href="/historial/paciente/{{ paciente.id }}/">📋 Historia clínica</a>
-      <a class="btn naranja" href="/consentimientos/paciente/{{ paciente.id }}/">📄 Consentimientos</a>
+      <h1 class="cr-ficha-nombre">{{ paciente.nombre_completo }}</h1>
+      <div class="cr-ficha-meta">
+        {{ paciente.get_tipo_documento_display }} {{ paciente.documento }}
+        {% if paciente.edad %} &middot; {{ paciente.edad }} años{% endif %}
+        {% if paciente.es_menor %} &middot; <span class="cr-badge cr-badge-info">Menor de edad</span>{% endif %}
+      </div>
     </div>
   </div>
-  <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:.85rem;">
-    <div><b>Documento:</b> {{ paciente.tipo_documento }} {{ paciente.documento }}</div>
-    <div><b>Fecha nacimiento:</b> {{ paciente.fecha_nacimiento|default:"—"|date:"d/m/Y" }}{% if paciente.edad %} ({{ paciente.edad }} años){% endif %}</div>
-    <div><b>Teléfono:</b> {{ paciente.telefono|default:"—" }}</div>
-    <div><b>Correo:</b> {{ paciente.correo|default:"—" }}</div>
-    <div><b>EPS:</b> {{ paciente.eps|default:"—" }}</div>
-    <div><b>Ciudad:</b> {{ paciente.ciudad }}</div>
-    {% if paciente.alergias %}<div style="grid-column:1/-1"><b>Alergias:</b> {{ paciente.alergias }}</div>{% endif %}
+  <div class="cr-ficha-acciones">
+    <button type="button" class="cr-btn cr-btn-primario" onclick="crDrawer.open({url:'/consentimientos/asistente/{{ paciente.pk }}/', title:'Nuevo consentimiento'})">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      Nuevo consentimiento
+    </button>
+    <a href="/historial/paciente/{{ paciente.pk }}/" class="cr-btn cr-btn-outline">Historia clínica completa</a>
+  </div>
+</div>
+
+<div class="cr-grid-2">
+  <div>
+    <div class="cr-seccion">
+      <div class="cr-seccion-header">
+        <h2 class="cr-seccion-titulo">Consentimientos</h2>
+      </div>
+      <div class="cr-flex-col cr-gap-2">
+        {% for c in paciente.consentimientos.all %}
+        <div class="cr-card cr-card-flat cr-flex cr-items-center cr-justify-between" style="padding:14px 18px">
+          <div>
+            <strong style="color:var(--cr-primario);font-size:.9rem">{{ c.plantilla.nombre }}</strong>
+            <div class="cr-text-tenue cr-text-sm">
+              {% if c.estado == 'FIRMADO' %}Firmado el {{ c.fecha_firma|date:"d/m/Y H:i" }}{% else %}Creado el {{ c.creado|date:"d/m/Y" }}{% endif %}
+              &middot; Dr(a). {{ c.odontologo.get_full_name|default:c.odontologo.username }}
+            </div>
+          </div>
+          <div class="cr-flex cr-items-center cr-gap-2">
+            {% if c.estado == 'PENDIENTE' %}
+              <span class="cr-badge cr-badge-pendiente"><span class="cr-badge-dot"></span>Pendiente</span>
+              <a href="{% url 'consentimientos:firmar' c.pk %}" class="cr-btn cr-btn-primario cr-btn-sm">Firmar</a>
+            {% elif c.estado == 'FIRMADO' %}
+              <span class="cr-badge cr-badge-exito"><span class="cr-badge-dot"></span>Firmado</span>
+              {% if c.pdf %}<a href="{% url 'consentimientos:pdf' c.pk %}" class="cr-btn cr-btn-outline cr-btn-sm" target="_blank">PDF</a>{% endif %}
+            {% elif c.estado == 'ANULADO' %}
+              <span class="cr-badge cr-badge-error">Anulado</span>
+            {% else %}
+              <span class="cr-badge cr-badge-neutro">Borrador</span>
+            {% endif %}
+          </div>
+        </div>
+        {% empty %}
+        <div class="cr-empty-state">
+          <p>Este paciente aún no tiene consentimientos.</p>
+          <button type="button" class="cr-btn cr-btn-primario cr-btn-sm" onclick="crDrawer.open({url:'/consentimientos/asistente/{{ paciente.pk }}/', title:'Nuevo consentimiento'})">Crear el primero</button>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="cr-seccion">
+      <div class="cr-seccion-header">
+        <h2 class="cr-seccion-titulo">Historia clínica &mdash; últimas evoluciones</h2>
+        <a href="/historial/paciente/{{ paciente.pk }}/" class="cr-text-sm">Ver completa →</a>
+      </div>
+      {% if ficha_clinica %}
+        {% if ficha_clinica.motivo_consulta %}
+        <div class="cr-card cr-card-flat cr-mb-3">
+          <div class="cr-dato-label">Motivo de consulta</div>
+          <div class="cr-dato-valor">{{ ficha_clinica.motivo_consulta }}</div>
+        </div>
+        {% endif %}
+        <div class="cr-flex-col cr-gap-2">
+          {% for e in ultimas_evoluciones %}
+          <div class="cr-card cr-card-flat" style="padding:14px 18px">
+            <div class="cr-flex cr-justify-between">
+              <strong style="font-size:.86rem;color:var(--cr-primario)">{{ e.procedimiento }}</strong>
+              <span class="cr-text-tenue cr-text-sm">{{ e.fecha|date:"d/m/Y" }}</span>
+            </div>
+            <p class="cr-text-sm cr-text-suave cr-mt-2" style="margin:6px 0 0">{{ e.descripcion|truncatewords:28 }}</p>
+          </div>
+          {% empty %}
+          <div class="cr-empty-state"><p>Sin evoluciones registradas todavía.</p></div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="cr-empty-state"><p>Aún no se ha abierto historia clínica para este paciente.</p></div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div>
+    <div class="cr-card cr-mb-4">
+      <div class="cr-card-header"><h3 class="cr-card-title" style="font-size:.9rem">Datos del paciente</h3></div>
+      <div class="cr-datos-grid">
+        <div class="cr-dato"><div class="cr-dato-label">Teléfono</div><div class="cr-dato-valor">{{ paciente.telefono|default:"—" }}</div></div>
+        <div class="cr-dato"><div class="cr-dato-label">Correo</div><div class="cr-dato-valor">{{ paciente.correo|default:"—" }}</div></div>
+        <div class="cr-dato"><div class="cr-dato-label">EPS</div><div class="cr-dato-valor">{{ paciente.eps|default:"—" }}</div></div>
+        <div class="cr-dato"><div class="cr-dato-label">Ciudad</div><div class="cr-dato-valor">{{ paciente.ciudad|default:"—" }}</div></div>
+        {% if paciente.es_menor %}
+        <div class="cr-dato" style="grid-column:1/-1"><div class="cr-dato-label">Acudiente</div><div class="cr-dato-valor">{{ paciente.acudiente_nombre|default:"—" }} {% if paciente.acudiente_parentesco %}({{ paciente.acudiente_parentesco }}){% endif %}</div></div>
+        {% endif %}
+        {% if paciente.alergias %}
+        <div class="cr-dato" style="grid-column:1/-1"><div class="cr-dato-label">Alergias</div><div class="cr-dato-valor">{{ paciente.alergias }}</div></div>
+        {% endif %}
+      </div>
+      <div class="cr-mt-3">
+        <a href="/admin/pacientes/paciente/{{ paciente.pk }}/change/" class="cr-text-sm">Editar datos completos →</a>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}
