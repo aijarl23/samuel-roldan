@@ -57,8 +57,9 @@ def enviar_whatsapp(consentimiento):
             body=(f'Hola {paciente.nombres}, su consentimiento informado para '
                   f'"{consentimiento.plantilla.nombre}" ha sido registrado exitosamente '
                   f'el {consentimiento.fecha_firma.strftime("%d/%m/%Y")}.\n'
-                  f'Si tiene dudas, comuníquese con el consultorio. '
-                  f'Consultorio Odontológico Samuel Roldán.')
+                  f'Ante cualquier duda o inconveniente con su tratamiento, escríbanos al '
+                  f'313 731 9827.\n'
+                  f'Clínica R — Samuel Roldán.')
         )
         consentimiento.enviado_whatsapp = True
         consentimiento.fecha_envio_whatsapp = timezone.now()

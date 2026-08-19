@@ -206,13 +206,13 @@ Igualmente, SI (  ) NO (  ) autorizo el uso del expediente con sus registros y e
 PLANTILLAS_NUEVAS = [
     {
         "nombre": "Ortodoncia — Consentimiento General (Alineadores, Brackets y auxiliares)",
-        "tipo": "GENERAL",
+        "tipo": "ORTODONCIA",
         "texto": TEXTO_ORTODONCIA_GENERAL,
         "requiere_autorizacion_expediente": True,
     },
     {
         "nombre": "Ortodoncia Interceptiva — Tratamiento Temprano",
-        "tipo": "GENERAL",
+        "tipo": "ORTODONCIA",
         "texto": TEXTO_ORTODONCIA_INTERCEPTIVA,
         "requiere_autorizacion_expediente": True,
     },
@@ -262,6 +262,8 @@ class Command(BaseCommand):
                         cambios.append("activa=True")
                     if existente.texto != datos["texto"]:
                         cambios.append("texto actualizado")
+                    if existente.tipo != datos["tipo"]:
+                        cambios.append("tipo actualizado")
                     if existente.requiere_autorizacion_expediente != datos["requiere_autorizacion_expediente"]:
                         cambios.append("requiere_autorizacion_expediente actualizado")
                     if cambios:
@@ -269,8 +271,9 @@ class Command(BaseCommand):
                         if not dry:
                             existente.activa = True
                             existente.texto = datos["texto"]
+                            existente.tipo = datos["tipo"]
                             existente.requiere_autorizacion_expediente = datos["requiere_autorizacion_expediente"]
-                            existente.save(update_fields=["activa", "texto", "requiere_autorizacion_expediente"])
+                            existente.save(update_fields=["activa", "texto", "tipo", "requiere_autorizacion_expediente"])
                     else:
                         self.stdout.write(f"  - Ya existía y estaba al día (sin cambios): {datos['nombre']!r}")
                 else:

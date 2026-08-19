@@ -22,6 +22,39 @@ NARANJA = colors.HexColor('#A9C877')
 GRIS = colors.HexColor('#8B978F')
 NEGRO = colors.HexColor('#1C2B27')
 
+# Recomendaciones de cuidado post-tratamiento para pacientes de Ortodoncia.
+# Es contenido informativo (no legal), fijo para toda plantilla tipo
+# ORTODONCIA — no se guarda en la base de datos porque no varía por paciente
+# ni necesita congelarse como el texto del consentimiento.
+CUIDADOS_ALINEADORES = (
+    'Utilízalos según lo indicado. Evita consumir bebidas y comidas mientras tengas '
+    'tus alineadores puestos. Evita exponerlos a temperaturas calientes.<br/>'
+    'Lavado: en un vaso con agua fría agrega goticas de vinagre blanco o Corega tabs '
+    'y sumerge tus alineadores; déjalos reposar de 20 a 30 minutos y enjuágalos con '
+    'abundante agua. Puedes usar jabón de tocador para el lavado diario — evita '
+    'lavarlos con crema dental, se pondrán opacos.'
+)
+CUIDADOS_BRACKETS = (
+    '<b>1. Cepillo de ortodoncia:</b> utiliza tu cepillo de ortodoncia y crema dental '
+    'para cepillarlos como normalmente lo haces.<br/>'
+    '<b>2. Cepillo interdental:</b> pásalo por debajo del alambre de modo que roce tus '
+    'dientes, con movimientos verticales, hasta que no quede ningún residuo — repítelo '
+    'con cada diente.<br/>'
+    '<b>3. Seda dental:</b> con ayuda del enhebrador pasa la seda por debajo del '
+    'alambre, deslízala por cada diente con movimientos en zigzag.<br/>'
+    '<b>4. Cera:</b> si sientes molestias, forma una bolita de cera y colócala sobre '
+    'el bracket, evitando que roce con la piel.'
+)
+CUIDADOS_GENERALES = (
+    'Durante todo tu tratamiento evita el consumo de alimentos duros (bombones, '
+    'chicharrón, maní) y de alimentos cauchudos (chicles).'
+)
+CUIDADOS_CONTACTO = (
+    'Ante cualquier duda o inconveniente, o si se te cae o rompe un bracket, avísanos '
+    'de inmediato para que tu tratamiento no se retrase — WhatsApp 313 731 9827, '
+    'Instagram @Samuelroldanr.'
+)
+
 
 def _firma_image(b64_data, ancho=6*cm, alto=2.5*cm):
     if not b64_data:
@@ -162,6 +195,22 @@ def generar(consentimiento):
     tf.setStyle(TableStyle([
         ('VALIGN', (0,0), (-1,-1), 'BOTTOM'), ('BOTTOMPADDING', (0,0), (-1,0), 4)]))
     el.append(tf)
+
+    # Recomendaciones de cuidado (solo tratamientos de Ortodoncia)
+    if c.plantilla.tipo == 'ORTODONCIA':
+        el.append(Spacer(1, 0.7*cm))
+        el.append(HRFlowable(width='100%', thickness=0.5, color=colors.HexColor('#C3CDC6')))
+        el.append(Spacer(1, 0.2*cm))
+        el.append(Paragraph('CUIDA TU TRATAMIENTO', s_seccion))
+        el.append(Paragraph('<b>Alineadores</b>', s_firma_lbl))
+        el.append(Paragraph(CUIDADOS_ALINEADORES, s_cuerpo))
+        el.append(Spacer(1, 0.15*cm))
+        el.append(Paragraph('<b>Brackets</b>', s_firma_lbl))
+        el.append(Paragraph(CUIDADOS_BRACKETS, s_cuerpo))
+        el.append(Spacer(1, 0.15*cm))
+        el.append(Paragraph(CUIDADOS_GENERALES, s_cuerpo))
+        el.append(Spacer(1, 0.15*cm))
+        el.append(Paragraph(CUIDADOS_CONTACTO, s_cuerpo))
 
     # Sello de auditoría
     el.append(Spacer(1, 0.8*cm))
