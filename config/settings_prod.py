@@ -6,6 +6,13 @@ from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Directorio de datos persistentes: si Railway tiene un Volume montado en
+# /data, la base de datos SQLite y los archivos subidos (fotos, PDFs
+# firmados) viven ahí y sobreviven a cada deploy. Sin volumen (dev local),
+# caen de vuelta a la carpeta del proyecto.
+_VOLUMEN = Path('/data')
+DATA_DIR = _VOLUMEN if _VOLUMEN.is_dir() else BASE_DIR
+
 # En Railway las variables ya están en el entorno del proceso: read_env() no
 # hace nada si no encuentra .env. En local, carga las variables de .env
 # (copiado de .env.example) sin necesidad de exportarlas manualmente.
@@ -103,7 +110,7 @@ if DATABASE_URL:
 else:
     DATABASES = {'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': DATA_DIR / 'db.sqlite3',
     }}
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -134,7 +141,7 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = DATA_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/accounts/login/'
