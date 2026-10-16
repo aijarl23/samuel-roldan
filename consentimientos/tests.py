@@ -9,6 +9,8 @@ from .models import Consentimiento, PlantillaConsentimiento
 from .services import pdf as pdf_svc
 
 
+FIRMA_PNG_VALIDA = ('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
+
 class FlujoConsentimientoTests(TestCase):
     """Cubre el flujo completo: crear -> firmar -> PDF, y quién puede hacer qué."""
 
@@ -50,7 +52,7 @@ class FlujoConsentimientoTests(TestCase):
             odontologo=self.odontologo, creado_por=self.odontologo, estado='PENDIENTE')
         self.client.force_login(self.odontologo)
         r = self.client.post(f'/consentimientos/firmar/{c.pk}/',
-                              {'firma_paciente': 'x' * 60}, follow=True)
+                              {'firma_paciente': FIRMA_PNG_VALIDA}, follow=True)
         c.refresh_from_db()
         self.assertEqual(c.estado, 'FIRMADO')
         self.assertTrue(c.texto_generado)
@@ -62,6 +64,15 @@ class FlujoConsentimientoTests(TestCase):
         self.assertEqual(r_pdf.status_code, 200)
         contenido = b''.join(r_pdf.streaming_content) if r_pdf.streaming else r_pdf.content
         self.assertEqual(contenido[:4], b'%PDF')
+
+    def test_firma_con_formato_invalido_es_rechazada(self):
+        c = Consentimiento.objects.create(
+            paciente=self.paciente, plantilla=self.plantilla,
+            odontologo=self.odontologo, creado_por=self.odontologo, estado='PENDIENTE')
+        self.client.force_login(self.odontologo)
+        self.client.post(f'/consentimientos/firmar/{c.pk}/', {'firma_paciente': 'x' * 60})
+        c.refresh_from_db()
+        self.assertEqual(c.estado, 'PENDIENTE', 'Una firma que no es imagen PNG no debe aceptarse')
 
     def test_menor_de_edad_requiere_firma_de_acudiente(self):
         menor = Paciente.objects.create(

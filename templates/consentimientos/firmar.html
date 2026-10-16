@@ -51,6 +51,9 @@
         <div class="cr-firma-placeholder" id="hint-paciente">Firme aquí</div>
       </div>
       <button type="button" class="cr-btn cr-btn-ghost cr-btn-sm cr-mt-2" onclick="limpiarCanvas('paciente')">Limpiar firma</button>
+      <label class="cr-btn cr-btn-ghost cr-btn-sm cr-mt-2" style="cursor:pointer">Subir imagen de firma
+        <input type="file" accept="image/png,image/jpeg,image/webp" hidden onchange="subirFirma('paciente', this)">
+      </label>
       <input type="hidden" name="firma_paciente" id="firma-paciente">
     </div>
 
@@ -63,6 +66,9 @@
         <div class="cr-firma-placeholder" id="hint-acudiente">Firme aquí</div>
       </div>
       <button type="button" class="cr-btn cr-btn-ghost cr-btn-sm cr-mt-2" onclick="limpiarCanvas('acudiente')">Limpiar firma</button>
+      <label class="cr-btn cr-btn-ghost cr-btn-sm cr-mt-2" style="cursor:pointer">Subir imagen de firma
+        <input type="file" accept="image/png,image/jpeg,image/webp" hidden onchange="subirFirma('acudiente', this)">
+      </label>
       <input type="hidden" name="firma_acudiente" id="firma-acudiente">
     </div>
     {% endif %}
@@ -130,7 +136,30 @@ function initCanvas(id) {
   canvas.addEventListener('touchmove', move, { passive: false });
   canvas.addEventListener('touchend', end);
 
-  canvases[id] = { canvas, ctx, hint, hidden, clear: () => {
+  function cargarImagen(file) {
+    if (!file || !/^image\/(png|jpeg|webp)$/.test(file.type)) { alert('Formato no válido. Use PNG, JPG o WEBP.'); return; }
+    if (file.size > 3 * 1024 * 1024) { alert('La imagen supera 3 MB.'); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const w = canvas.getBoundingClientRect().width, h = canvas.getBoundingClientRect().height;
+        ctx.clearRect(0, 0, w, h);
+        const r = Math.min(w / img.width, h / img.height) * 0.95;
+        const dw = img.width * r, dh = img.height * r;
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+        empty = false;
+        hint.style.display = 'none';
+        hidden.value = canvas.toDataURL('image/png');
+      };
+      img.onerror = () => alert('No se pudo leer la imagen.');
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  canvases[id] = { canvas, ctx, hint, hidden, cargarImagen, clear: () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     empty = true; hidden.value = '';
     hint.style.display = 'flex';
@@ -138,6 +167,7 @@ function initCanvas(id) {
 }
 
 function limpiarCanvas(id) { canvases[id]?.clear(); }
+function subirFirma(id, input) { canvases[id]?.cargarImagen(input.files[0]); input.value = ''; }
 
 initCanvas('paciente');
 {% if c.paciente.es_menor %}initCanvas('acudiente');{% endif %}

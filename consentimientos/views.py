@@ -36,6 +36,10 @@ def asistente(request, paciente_pk):
             odontologo=request.user, creado_por=request.user,
             estado='PENDIENTE',
         )
+        if not request.user.has_perm('consentimientos.change_consentimiento'):
+            # Auxiliar: puede crearlo pero no firmarlo; queda pendiente para el odontólogo.
+            messages.success(request, 'Consentimiento creado y pendiente de firma por el odontólogo.')
+            return JsonResponse({'redirect': reverse('pacientes:detalle', args=[paciente.pk])})
         return JsonResponse({'redirect': reverse('consentimientos:firmar', args=[c.pk])})
 
     return render(request, 'consentimientos/_asistente_panel.html', {
@@ -80,6 +84,13 @@ def firmar(request, pk):
 
     if request.method == 'POST':
         firma_p = request.POST.get('firma_paciente', '').strip()
+        firma_a = request.POST.get('firma_acudiente', '').strip()
+        _pref = 'data:image/png;base64,'
+        _max = 4 * 1024 * 1024
+        for _f in (firma_p, firma_a):
+            if _f and (not _f.startswith(_pref) or len(_f) > _max):
+                messages.error(request, 'Imagen de firma no válida.')
+                return redirect('consentimientos:firmar', pk=pk)
         if not firma_p or len(firma_p) < 50:
             messages.error(request, 'Debe registrar la firma del paciente.')
             return redirect('consentimientos:firmar', pk=pk)

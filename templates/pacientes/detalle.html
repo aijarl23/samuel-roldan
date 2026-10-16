@@ -43,7 +43,7 @@
           <div class="cr-flex cr-items-center cr-gap-2">
             {% if c.estado == 'PENDIENTE' %}
               <span class="cr-badge cr-badge-pendiente"><span class="cr-badge-dot"></span>Pendiente</span>
-              <a href="{% url 'consentimientos:firmar' c.pk %}" class="cr-btn cr-btn-primario cr-btn-sm">Firmar</a>
+              {% if perms.consentimientos.change_consentimiento %}<a href="{% url 'consentimientos:firmar' c.pk %}" class="cr-btn cr-btn-primario cr-btn-sm">Firmar</a>{% else %}<span class="cr-badge">Pendiente del odontólogo</span>{% endif %}
             {% elif c.estado == 'FIRMADO' %}
               <span class="cr-badge cr-badge-exito"><span class="cr-badge-dot"></span>Firmado</span>
               {% if c.pdf %}<a href="{% url 'consentimientos:pdf' c.pk %}" class="cr-btn cr-btn-outline cr-btn-sm" target="_blank">PDF</a>{% endif %}
